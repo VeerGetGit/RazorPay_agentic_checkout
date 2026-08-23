@@ -3,7 +3,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from db.models import Base
-from datetime import datetime
+from datetime import datetime, timezone
 import threading
 import logging
 import os
@@ -66,7 +66,7 @@ def _expiry_job():
     while True:
         try:
             db = SessionLocal()
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
 
             # Find expired sessions
             from db.models import Session as SessionModel

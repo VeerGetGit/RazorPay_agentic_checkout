@@ -1,7 +1,7 @@
 # backend/db/session_store.py
 
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from db.models import Session as SessionModel
 import secrets
 import logging
@@ -28,7 +28,7 @@ def create_session(db: Session) -> dict:
     Frontend stores in React memory ONLY — not localStorage.
     """
     token      = secrets.token_hex(32)   # 64 char secure random string
-    now        = datetime.utcnow()
+    now        = datetime.now(timezone.utc)
     expires_at = now + timedelta(minutes=SESSION_EXPIRY_MINUTES)
 
     session = SessionModel(
@@ -78,7 +78,7 @@ def validate_session(token: str, db: Session) -> dict:
         }
 
     # Session expired
-    if session.expires_at < datetime.utcnow():
+    if session.expires_at < datetime.now(timezone.utc):
         logger.warning(f"❌ Session expired: {session.id[:8]}...")
         return {
             "valid":  False,
@@ -86,8 +86,8 @@ def validate_session(token: str, db: Session) -> dict:
         }
 
     # Valid — reset idle timer
-    session.last_active = datetime.utcnow()
-    session.expires_at  = datetime.utcnow() + timedelta(
+    session.last_active = datetime.now(timezone.utc)
+    session.expires_at  = datetime.now(timezone.utc) + timedelta(
                             minutes=SESSION_EXPIRY_MINUTES)
     db.commit()
 

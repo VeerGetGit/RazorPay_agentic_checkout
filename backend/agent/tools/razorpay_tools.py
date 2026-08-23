@@ -9,7 +9,7 @@ import json
 import logging
 import os
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timezone
 
 load_dotenv()
 
@@ -35,7 +35,7 @@ def _generate_idempotency_key(
     Prevents duplicate Razorpay orders on double-tap.
     """
     cart_str   = json.dumps(cart, sort_keys=True)
-    minute_str = datetime.utcnow().strftime("%Y%m%d%H%M")
+    minute_str = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
     raw        = f"{session_id}_{cart_str}_{amount}_{minute_str}"
     return hashlib.md5(raw.encode()).hexdigest()
 
@@ -157,7 +157,7 @@ def verify_payment(razorpay_order_id: str) -> str:
 
         if order:
             order.status     = payment_status
-            order.updated_at = datetime.utcnow()
+            order.updated_at = datetime.now(timezone.utc)
             db.commit()
 
         logger.info(

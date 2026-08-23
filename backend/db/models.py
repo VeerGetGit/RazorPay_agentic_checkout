@@ -5,7 +5,7 @@ from sqlalchemy import (
     Integer, Boolean, Text, ForeignKey
 )
 from sqlalchemy.orm import declarative_base, relationship
-from datetime import datetime
+from datetime import datetime , timezone
 from uuid import uuid4
 
 Base = declarative_base()
@@ -25,9 +25,9 @@ class Session(Base):
     token        = Column(String, unique=True, nullable=False)
     spend_limit  = Column(Float, default=100000.0)   # set once, never reset
     spent_so_far = Column(Float, default=0.0)        # running total
-    last_active  = Column(DateTime, default=datetime.utcnow)
+    last_active  = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     expires_at   = Column(DateTime, nullable=False)  # last_active + 30 min
-    created_at   = Column(DateTime, default=datetime.utcnow)
+    created_at   = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     orders    = relationship("Order",    back_populates="session",
@@ -52,7 +52,7 @@ class Product(Base):
     category    = Column(String, nullable=False)   # phones/shoes/bags/watches
     stock       = Column(Integer, default=10)
     image_url   = Column(String, nullable=True)
-    created_at  = Column(DateTime, default=datetime.utcnow)
+    created_at  = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ── Order Table ────────────────────────────────────────────────────────────
@@ -74,9 +74,9 @@ class Order(Base):
                                 # pending / success / failed / cancelled
     idempotency_key   = Column(String, unique=True, nullable=False)
     items             = Column(Text, nullable=False)    # JSON string of cart
-    created_at        = Column(DateTime, default=datetime.utcnow)
-    updated_at        = Column(DateTime, default=datetime.utcnow,
-                               onupdate=datetime.utcnow)
+    created_at        = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at        = Column(DateTime, default=lambda: datetime.now(timezone.utc),
+                               onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     session = relationship("Session", back_populates="orders")
@@ -100,7 +100,7 @@ class AuditLog(Base):
     detail     = Column(Text, nullable=True)      # extra info
     status     = Column(String, default="success")
                          # success / blocked / failed
-    timestamp  = Column(DateTime, default=datetime.utcnow)
+    timestamp  = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     session = relationship("Session", back_populates="audit_logs")

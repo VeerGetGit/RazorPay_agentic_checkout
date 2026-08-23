@@ -2,7 +2,7 @@
 
 from db.database import SessionLocal
 from db.models import Order
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ def check_duplicate_order(
     """
     db = SessionLocal()
     try:
-        cutoff = datetime.utcnow() - timedelta(seconds=60)
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
 
         recent_order = db.query(Order).filter(
             Order.session_id  == session_id,
