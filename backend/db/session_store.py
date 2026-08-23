@@ -28,7 +28,7 @@ def create_session(db: Session) -> dict:
     Frontend stores in React memory ONLY — not localStorage.
     """
     token      = secrets.token_hex(32)   # 64 char secure random string
-    now        = datetime.now(timezone.utc)
+    now        = datetime.now(timezone.utc).replace(tzinfo=None)
     expires_at = now + timedelta(minutes=SESSION_EXPIRY_MINUTES)
 
     session = SessionModel(
@@ -78,7 +78,7 @@ def validate_session(token: str, db: Session) -> dict:
         }
 
     # Session expired
-    if session.expires_at < datetime.now(timezone.utc):
+    if session.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
         logger.warning(f"❌ Session expired: {session.id[:8]}...")
         return {
             "valid":  False,
@@ -86,9 +86,9 @@ def validate_session(token: str, db: Session) -> dict:
         }
 
     # Valid — reset idle timer
-    session.last_active = datetime.now(timezone.utc)
-    session.expires_at  = datetime.now(timezone.utc) + timedelta(
-                            minutes=SESSION_EXPIRY_MINUTES)
+    session.last_active = datetime.now(timezone.utc).replace(tzinfo=None)
+    session.expires_at  = (datetime.now(timezone.utc) + timedelta(
+                            minutes=SESSION_EXPIRY_MINUTES)).replace(tzinfo=None)
     db.commit()
 
     return {

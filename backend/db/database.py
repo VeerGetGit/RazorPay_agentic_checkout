@@ -66,7 +66,7 @@ def _expiry_job():
     while True:
         try:
             db = SessionLocal()
-            now = datetime.now(timezone.utc)
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
 
             # Find expired sessions
             from db.models import Session as SessionModel
