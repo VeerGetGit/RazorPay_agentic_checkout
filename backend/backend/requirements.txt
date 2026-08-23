@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+langgraph
+langchain
+langchain-groq
+langchain-community
+langchain-core
+guardrails-ai
+razorpay
+sqlalchemy
+python-dotenv
+pytest
+httpx
+sse-starlette
+groq
