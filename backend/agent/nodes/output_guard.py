@@ -1,7 +1,7 @@
 # backend/agent/nodes/output_guard.py
 
 from agent.state import AgentState
-from guardrails.output_validators import validate_output
+from validators.output_validators import validate_output
 import logging
 
 logger = logging.getLogger(__name__)

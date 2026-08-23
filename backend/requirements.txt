@@ -6,6 +6,8 @@ langchain-groq
 langchain-community
 langchain-core
 guardrails-ai
+guardrails-ai-toxic-language
+guardrails-ai-detect-pii
 razorpay
 sqlalchemy
 python-dotenv
@@ -13,3 +15,7 @@ pytest
 httpx
 sse-starlette
 groq
+ipython
+spacy
+presidio-analyzer
+presidio-anonymizer

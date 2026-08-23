@@ -159,16 +159,12 @@ def build_graph() -> StateGraph:
 graph = build_graph()
 
 # ── Visualize graph (run this once to see the diagram) ────────────────────
+# NEW:
 if __name__ == "__main__":
-    from IPython.display import Image, display
-    import os
-
-    # Option 1 — Print Mermaid code (paste at mermaid.live)
-    print("=== MERMAID DIAGRAM CODE ===")
     print(graph.get_graph().draw_mermaid())
-
-    # Option 2 — Save as PNG image
-    png_data = graph.get_graph().draw_mermaid_png()
-    with open("graph_diagram.png", "wb") as f:
-        f.write(png_data)
-    print("✅ Graph saved as graph_diagram.png")
+    
+    # Save as PNG
+    png = graph.get_graph().draw_mermaid_png()
+    with open("graph.png", "wb") as f:
+        f.write(png)
+    print("✅ Saved as graph.png")

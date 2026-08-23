@@ -1,7 +1,7 @@
 # backend/agent/nodes/input_guard.py
 
 from agent.state import AgentState
-from guardrails.input_validators import validate_input
+from validators.input_validators import validate_input
 import logging
 
 logger = logging.getLogger(__name__)

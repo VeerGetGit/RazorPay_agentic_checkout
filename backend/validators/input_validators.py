@@ -1,21 +1,17 @@
-# backend/guardrails/input_validators.py
+# backend/validators/input_validators.py
 
+import os
+import logging
+from dotenv import load_dotenv
 from guardrails import Guard, Validator, register_validator
 from guardrails.hub import ToxicLanguage
-from guardrails.validator_base import (
-    ValidationResult,
-    PassResult,
-    FailResult,
-)
+from guardrails.validator_base import ValidationResult, PassResult, FailResult
 from groq import Groq
-import logging
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
+_env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(_env_path, override=True)
 
 logger = logging.getLogger(__name__)
-
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
@@ -38,7 +34,7 @@ class PromptInjectionGuard(Validator):
             response = groq_client.chat.completions.create(
                 model    = os.getenv(
                             "GROQ_MODEL_GUARD",
-                            "meta-llama/llama-prompt-guard-2-86b"
+                            "meta-llama/llama-prompt-guard-2-86m"
                            ),
                 messages = [{"role": "user", "content": value}],
                 max_tokens  = 10,
@@ -123,18 +119,12 @@ class ShoppingTopicGuard(Validator):
 # ── Master Input Guard Chain ───────────────────────────────────────────────
 # All validators in ONE Guard object
 # Order: cheapest first → most expensive last (fail fast)
-input_guard = Guard().use_many(
-    ToxicLanguage(                      # free — local library
-        threshold         = 0.5,
-        validation_method = "sentence",
-        on_fail           = "exception",
-    ),
-    PromptInjectionGuard(               # Llama Prompt Guard 2 (86B)
-        on_fail = "exception",
-    ),
-    ShoppingTopicGuard(                 # compound-mini
-        on_fail = "exception",
-    ),
+# NEW:
+input_guard = (
+    Guard()
+    .use(ToxicLanguage(threshold=0.5, validation_method="sentence", on_fail="exception"))
+    .use(PromptInjectionGuard(on_fail="exception"))
+    .use(ShoppingTopicGuard(on_fail="exception"))
 )
 
 

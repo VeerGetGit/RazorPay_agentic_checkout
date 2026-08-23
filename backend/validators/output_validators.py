@@ -79,19 +79,14 @@ class PriceHallucinationGuard(Validator):
 
 
 # ── Output Guard Chain ─────────────────────────────────────────────────────
-output_guard = Guard().use_many(
-    DetectPII(                          # scrub API keys, emails, phone numbers
-        pii_entities = [
-            "API_KEY",
-            "EMAIL_ADDRESS",
-            "PHONE_NUMBER",
-            "CREDIT_CARD",
-        ],
-        on_fail = "fix",                # fix = replace with [REDACTED]
-    ),
-    PriceHallucinationGuard(            # block hallucinated prices
-        on_fail = "exception",
-    ),
+# NEW:
+output_guard = (
+    Guard()
+    .use(DetectPII(
+        pii_entities=["API_KEY", "EMAIL_ADDRESS", "PHONE_NUMBER", "CREDIT_CARD"],
+        on_fail="fix"
+    ))
+    .use(PriceHallucinationGuard(on_fail="exception"))
 )
 
 

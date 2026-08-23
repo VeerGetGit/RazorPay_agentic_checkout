@@ -1,7 +1,7 @@
 # backend/agent/nodes/spend_guard.py
 
 from agent.state import AgentState
-from guardrails.spend_validators import validate_spend
+from validators.spend_validators import validate_spend
 import logging
 
 logger = logging.getLogger(__name__)
