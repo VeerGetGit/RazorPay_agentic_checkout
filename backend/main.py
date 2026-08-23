@@ -94,11 +94,11 @@ app.include_router(stream_router, prefix="/api", tags=["Stream"])
 
 
 # ── Session endpoints ──────────────────────────────────────────────────────
+# NEW — correct:
 @app.post("/api/session/create")
-async def create_new_session(db: Session = None):
+async def create_new_session():
     """Creates a new session. Called by frontend on app load."""
-    if db is None:
-        db = SessionLocal()
+    db = SessionLocal()
     try:
         session = create_session(db)
         logger.info(f"✅ New session created: {session['session_id'][:8]}...")
