@@ -42,4 +42,4 @@ const MessageBubble = ({ message }) => {
   )
 }
 
-export default MessageBubbles
+export default MessageBubble

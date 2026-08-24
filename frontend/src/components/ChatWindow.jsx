@@ -12,7 +12,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
 
   // Auto scroll to bottom
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    bottomRef.current?.scrollIntoView({ behavior: 'instant' })
   }, [messages, loading])
 
   const handleSend = () => {
