@@ -6,36 +6,23 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def route_intent(state: AgentState) -> str:
-    """
-    Conditional edge after intent_node.
-    Routes to the correct node based on classified intent.
-
-    Returns:
-        "catalog"   → catalog_node   (browse/search)
-        "checkout"  → checkout_node  (buy/purchase)
-        "respond"   → respond_node   (status/cancel/unknown)
-        "blocked"   → respond_node   (input was blocked)
-    """
-
-    # First check if input was blocked
+def route_after_input_guard(state: AgentState) -> str:
+    """Routes after input_guard node."""
     if state.get("input_blocked"):
-        logger.info("🔀 Route: input_blocked → respond")
+        logger.info("🔀 Route: input blocked → respond")
         return "blocked"
+    logger.info("🔀 Route: input passed → intent")
+    return "intent"
 
+
+def route_after_intent(state: AgentState) -> str:
+    """Routes after intent node."""
     intent = state.get("intent", "unknown")
     logger.info(f"🔀 Route intent: {intent}")
 
     if intent == "browse":
         return "catalog"
-
     elif intent == "checkout":
         return "checkout"
-
-    elif intent in ["status", "cancel", "unknown"]:
-        return "respond"
-
     else:
-        # Default to browse for anything unexpected
-        logger.warning(f"⚠️ Unknown intent '{intent}' → defaulting to catalog")
-        return "catalog"
+        return "respond"

@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# In-memory cart store (persists during server session)
+_cart_store = {}
 
 # ── Request / Response models ──────────────────────────────────────────────
 class ChatRequest(BaseModel):
@@ -89,6 +91,10 @@ async def chat(
         spent_so_far  = session_check["spent_so_far"],
         user_message  = request.message,
     )
+    # Load saved cart for this session
+    saved_cart = _cart_store.get(request.session_id, [])
+    initial_state["cart"] = saved_cart
+    initial_state["cart_total"] = sum(item["total"] for item in saved_cart)
 
     logger.info(
         f"💬 Chat request: session={request.session_id[:8]}... "
@@ -99,10 +105,37 @@ async def chat(
     try:
         result = graph.invoke(initial_state)
 
+        # Save cart back to memory
+        _cart_store[request.session_id] = result.get("cart", [])
+
         logger.info(
             f"✅ Chat response: intent={result.get('intent')} "
             f"payment_status={result.get('payment_status')}"
         )
+
+        # Save audit log to DB
+        from db.database import SessionLocal as AuditDB
+        from db.models import AuditLog
+        audit_entries = result.get("audit_log", [])
+        if audit_entries:
+            audit_db = AuditDB()
+            try:
+                for entry in audit_entries:
+                    log = AuditLog(
+                        session_id = request.session_id,
+                        node       = entry.get("node", "unknown"),
+                        action     = entry.get("action", ""),
+                        detail     = entry.get("detail", ""),
+                        status     = entry.get("status", "success"),
+                    )
+                    audit_db.add(log)
+                audit_db.commit()
+            except Exception as e:
+                logger.error(f"❌ Audit save error: {e}")
+                audit_db.rollback()
+            finally:
+                audit_db.close()
+
 
         return ChatResponse(
             response         = result.get("final_response", ""),

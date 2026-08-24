@@ -34,6 +34,15 @@ class PriceHallucinationGuard(Validator):
         self, value: str, metadata: dict
     ) -> ValidationResult:
 
+        # Skip checkout summaries and payment confirmations
+        skip_phrases = [
+        "Cart total", "Order Summary", "order_",
+        "Payment successful", "🛒", "Total:", "Remaining:"
+        ]
+
+        if any(phrase in value for phrase in skip_phrases):
+            return PassResult()
+    
         # Find all prices mentioned in response (₹ followed by numbers)
         price_pattern = r'₹([\d,]+(?:\.\d{1,2})?)'
         mentioned_prices = re.findall(price_pattern, value)

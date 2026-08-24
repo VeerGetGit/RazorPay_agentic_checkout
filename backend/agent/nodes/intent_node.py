@@ -1,7 +1,7 @@
 # backend/agent/nodes/intent_node.py
 
 from agent.state import AgentState
-from agent.llm import llm
+from agent.llm import llm_mini as llm
 from langchain_core.messages import SystemMessage, HumanMessage
 import logging
 
@@ -11,26 +11,26 @@ INTENT_SYSTEM_PROMPT = """
 You are an intent classifier for a shopping assistant.
 
 Classify the user message into EXACTLY one of these intents:
-- browse    : user wants to search, view, or explore products
-- checkout  : user wants to buy, purchase, add to cart, or pay
-- status    : user wants to know order status or payment status
-- cancel    : user wants to cancel an order
-- unknown   : message doesn't fit any category above
+- browse    : user wants to search, view, or add items to cart
+- checkout  : user wants to buy, pay, or purchase something
+- status    : user wants order status
+- cancel    : user wants to cancel
+- unknown   : doesn't fit any category
 
 Rules:
 - Reply with ONLY the intent word in lowercase
-- No explanation, no punctuation, just the word
-- When in doubt between browse and checkout → choose browse
+- "add to cart" → browse
+- "buy it", "buy everything", "purchase", "checkout", "pay" → checkout
+- When in doubt → browse
 
 Examples:
-"show me phones"           → browse
-"what phones do you have"  → browse
-"add nike shoes to cart"   → checkout
-"buy the iPhone"           → checkout
-"I want to purchase this"  → checkout
-"what is my order status"  → status
-"cancel my order"          → cancel
-"write me a poem"          → unknown
+"show me phones"              → browse
+"add the iPhone to cart"      → browse
+"buy it"                      → checkout
+"buy everything"              → checkout
+"I want to purchase"          → checkout
+"what is my order status"     → status
+"write me a poem"             → unknown
 """
 
 

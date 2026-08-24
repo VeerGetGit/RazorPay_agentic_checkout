@@ -17,7 +17,7 @@ from agent.nodes.audit_logger   import audit_logger_node
 from agent.nodes.respond_node   import respond_node
 
 # ── Import all edges ───────────────────────────────────────────────────────
-from agent.edges.route_intent  import route_intent
+from agent.edges.route_intent  import route_after_input_guard, route_after_intent
 from agent.edges.route_spend   import route_spend, route_consent
 from agent.edges.route_payment import route_payment
 
@@ -79,26 +79,23 @@ def build_graph() -> StateGraph:
 
     # Input guard → intent or respond (if blocked)
     builder.add_conditional_edges(
-        "input_guard",
-        route_intent,
-        {
-            "catalog":  "intent",
-            "checkout": "intent",
-            "respond":  "respond",
-            "blocked":  "respond",
-        }
+    "input_guard",
+    route_after_input_guard,
+    {
+        "intent":  "intent",
+        "blocked": "respond",
+    }
     )
 
     # Intent → catalog or checkout or respond
     builder.add_conditional_edges(
-        "intent",
-        route_intent,
-        {
-            "catalog":  "catalog",
-            "checkout": "checkout",
-            "respond":  "respond",
-            "blocked":  "respond",
-        }
+    "intent",
+    route_after_intent,
+    {
+        "catalog":  "catalog",
+        "checkout": "checkout",
+        "respond":  "respond",
+    }
     )
 
     # Catalog → output_guard → respond

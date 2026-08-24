@@ -36,10 +36,14 @@ class RateLimitedChatGroq(ChatGroq):
 # ── Main Agent LLM ─────────────────────────────────────────────────────────
 # Used by: intent_node, catalog_node, checkout_node,
 #          recovery_node, respond_node
+
+_model      = os.getenv("GROQ_MODEL", "groq/compound")
+_model_mini = os.getenv("GROQ_MODEL_MINI", "openai/gpt-oss-20b")
+
 llm = RateLimitedChatGroq(
-    model       = os.getenv("GROQ_MODEL", "compound"),
+    model       = _model,
     api_key     = os.getenv("GROQ_API_KEY"),
-    temperature = 0,       # deterministic — payments must be predictable
+    temperature = 0,
     max_tokens  = 1024,
 )
 
@@ -48,11 +52,14 @@ llm = RateLimitedChatGroq(
 # Used by: ShoppingTopicGuard in input_validators.py
 # Faster and cheaper for simple classification tasks
 llm_mini = RateLimitedChatGroq(
-    model       = os.getenv("GROQ_MODEL_MINI", "compound-mini"),
+    model       = _model_mini,
     api_key     = os.getenv("GROQ_API_KEY"),
     temperature = 0,
-    max_tokens  = 64,      # classification only needs short response
-)
+    max_tokens  = 64,
+) #classification needs only shorter response
+
+
+
 
 
 # ── Health Check ───────────────────────────────────────────────────────────
