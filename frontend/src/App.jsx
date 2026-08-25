@@ -114,7 +114,8 @@ const App = () => {
       </div>
 
       {/* Main layout */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-120px)]">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4" style={{height: 'calc(100vh - 120px)'}}>
+        
 
         {/* Left sidebar */}
         <div className="lg:col-span-1 flex flex-col gap-4">

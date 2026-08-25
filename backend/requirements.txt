@@ -19,3 +19,4 @@ ipython
 spacy
 presidio-analyzer
 presidio-anonymizer
+httpx

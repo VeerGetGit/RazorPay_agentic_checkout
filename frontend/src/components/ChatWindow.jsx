@@ -54,7 +54,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4" style={{overflowAnchor: 'none'}}>
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
