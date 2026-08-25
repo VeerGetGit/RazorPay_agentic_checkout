@@ -21,7 +21,6 @@ const App = () => {
 
   const [lastOrder, setLastOrder] = useState(null)
 
-  // Session
   const {
     sessionId,
     token,
@@ -32,16 +31,13 @@ const App = () => {
     updateSpend,
   } = useSession()
 
-  // Audit
   const { logs } = useAudit(sessionId)
 
-  // Handle state updates from chat
   const handleStateUpdate = useCallback((newState) => {
     setAgentState(prev => ({ ...prev, ...newState }))
     if (newState.spentSoFar !== undefined) {
       updateSpend(newState.spentSoFar)
     }
-    // Track successful payment
     if (newState.paymentStatus === 'success') {
       setLastOrder({
         orderId: newState.orderId,
@@ -51,7 +47,6 @@ const App = () => {
     }
   }, [updateSpend])
 
-  // Chat
   const {
     messages,
     loading: chatLoading,
@@ -61,10 +56,9 @@ const App = () => {
     sendMessage,
   } = useChat(sessionId, handleStateUpdate)
 
-  // Loading state
   if (sessionLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-400">Initializing session...</p>
@@ -75,7 +69,7 @@ const App = () => {
 
   if (sessionError) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 mb-4">{sessionError}</p>
           <button
@@ -90,10 +84,11 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 p-4">
+    <div style={{height: '100vh', background: '#0f172a', padding: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column'}}>
+
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-4">
-        <div className="flex items-center justify-between">
+      <div style={{marginBottom: '16px', flexShrink: 0}}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-xl">
               🛒
@@ -114,11 +109,18 @@ const App = () => {
       </div>
 
       {/* Main layout */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4" style={{height: 'calc(100vh - 120px)'}}>
-        
-
+      <div
+        className="max-w-7xl mx-auto w-full"
+        style={{
+          flex: 1,
+          display: 'grid',
+          gridTemplateColumns: '1fr 2fr',
+          gap: '16px',
+          minHeight: 0,
+        }}
+      >
         {/* Left sidebar */}
-        <div className="lg:col-span-1 flex flex-col gap-4">
+        <div style={{display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, overflowY: 'auto'}}>
           <SpendMeter
             spendLimit={spendLimit}
             spentSoFar={agentState.spentSoFar || spentSoFar}
@@ -128,13 +130,13 @@ const App = () => {
             cart={cart}
             cartTotal={cartTotal}
           />
-          <div className="flex-1">
+          <div style={{flex: 1, minHeight: '200px'}}>
             <AuditTrail logs={logs} />
           </div>
         </div>
 
         {/* Chat window */}
-        <div className="lg:col-span-2">
+        <div style={{minHeight: 0}}>
           <ChatWindow
             messages={messages}
             loading={chatLoading}

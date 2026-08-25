@@ -11,31 +11,12 @@ logger = logging.getLogger(__name__)
 def payment_node(state: AgentState) -> AgentState:
     """
     Executes the actual payment via Razorpay API.
-    Only reached after:
-    - spend_guard approved the amount
-    - action_guard confirmed user consent
-
-    Uses idempotency key to prevent duplicate charges.
-
-    On success:
-    - Sets payment_status = "success"
-    - Sets razorpay_order_id
-    - Updates spent_so_far
-    - Routes to audit_logger
-
-    On failure:
-    - Sets payment_failed = True
-    - Sets failure_reason
-    - Routes to recovery_node
+    Only reached after spend_guard and action_guard approved.
     """
 
-    logger.info(
-        f"💳 Payment node executing: "
-        f"Rs.{state['payment_amount']:,.0f}"
-    )
+    logger.info(f"💳 Payment node: ₹{state['payment_amount']:,.0f}")
 
     try:
-        # ── Create Razorpay order ──────────────────────────────────────────
         result_json = create_razorpay_order.invoke({
             "session_id": state["session_id"],
             "amount":     state["payment_amount"],
@@ -44,7 +25,7 @@ def payment_node(state: AgentState) -> AgentState:
 
         result = json.loads(result_json)
 
-        # ── Handle duplicate order ─────────────────────────────────────────
+        # ── Duplicate order ────────────────────────────────────────────────
         if result["status"] == "duplicate":
             logger.warning("⚠️ Duplicate order detected")
 
@@ -62,23 +43,35 @@ def payment_node(state: AgentState) -> AgentState:
                 "razorpay_order_id": result.get("razorpay_order_id"),
                 "payment_failed":    False,
                 "final_response":    (
-                    f"You already have an order for this amount. "
-                    f"Order ID: {result.get('razorpay_order_id')}. "
-                    f"Please complete the payment."
+                    f"Duplicate order detected. "
+                    f"You already placed this order less than 60 seconds ago."
                 ),
                 "audit_log": state["audit_log"] + [audit_entry],
             }
 
-        # ── Handle successful order creation ───────────────────────────────
+        # ── Success ────────────────────────────────────────────────────────
         if result["status"] == "created":
             razorpay_order_id = result["razorpay_order_id"]
             amount            = result["amount"]
 
-            logger.info(f"✅ Razorpay order created: {razorpay_order_id}")
+            # Update spent_so_far in DB
+            from db.session_store import update_spent
+            from db.database import SessionLocal
+            db = SessionLocal()
+            try:
+                update_spent(state["session_id"], amount, db)
+            except Exception as e:
+                logger.error(f"❌ Spend update error: {e}")
+            finally:
+                db.close()
+
+            new_spent = state["spent_so_far"] + amount
+
+            logger.info(f"✅ Order created: {razorpay_order_id} | ₹{amount:,.0f}")
 
             audit_entry = {
                 "node":      "payment_node",
-                "action":    f"order created — Rs.{amount:,.0f}",
+                "action":    f"order created — ₹{amount:,.0f}",
                 "detail":    f"Razorpay Order ID: {razorpay_order_id}",
                 "status":    "success",
                 "timestamp": _now(),
@@ -90,11 +83,11 @@ def payment_node(state: AgentState) -> AgentState:
                 "razorpay_order_id": razorpay_order_id,
                 "payment_amount":    amount,
                 "payment_failed":    False,
-                "spent_so_far":      state["spent_so_far"] + amount,
-                "remaining_limit":   state["spend_limit"] - (
-                                        state["spent_so_far"] + amount
-                                     ),
-                "final_response":    (
+                "spent_so_far":      new_spent,
+                "remaining_limit":   state["spend_limit"] - new_spent,
+                "cart":              [],      # clear cart after payment
+                "cart_total":        0.0,     # reset cart total
+                "final_response": (
                     f"Payment successful! 🎉\n\n"
                     f"Order ID: {razorpay_order_id}\n"
                     f"Amount:   Rs.{amount:,.0f}\n\n"
@@ -103,7 +96,7 @@ def payment_node(state: AgentState) -> AgentState:
                 "audit_log": state["audit_log"] + [audit_entry],
             }
 
-        # ── Handle failed order creation ───────────────────────────────────
+        # ── Failed ─────────────────────────────────────────────────────────
         else:
             error = result.get("error", "Unknown error")
             logger.error(f"❌ Payment failed: {error}")

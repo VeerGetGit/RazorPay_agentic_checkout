@@ -65,6 +65,29 @@ def spend_guard_node(state: AgentState) -> AgentState:
             f"Would you like to see products under this budget?"
         )
 
+        remaining = state["spend_limit"] - state["spent_so_far"]
+        block_response = (
+            f"{result['reason']}\n\n"
+            f"Your remaining limit is ₹{remaining:,.0f}.\n\n"
+            f"Here are some products within your budget:"
+        )
+
+        # Find products under remaining limit
+        from db.database import SessionLocal
+        from db.models import Product
+        db = SessionLocal()
+        budget_products = db.query(Product).filter(
+            Product.price <= remaining,
+            Product.stock > 0
+        ).order_by(Product.price.desc()).limit(3).all()
+        db.close()
+
+        if budget_products:
+            lines = "\n".join([
+                f"• {p.name} — ₹{p.price:,.0f}"
+                for p in budget_products
+            ])
+            block_response += f"\n\n{lines}"
         return {
             **state,
             "spend_blocked":       True,

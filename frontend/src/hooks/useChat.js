@@ -57,7 +57,7 @@ export const useChat = (sessionId, onStateUpdate) => {
         onStateUpdate({
           cart:            data.cart || [],
           cartTotal:       data.cart_total || 0,
-          spentSoFar:      data.spent_so_far || 0,
+          spentSoFar:      data.spent_so_far || 0,      // ← check this exists
           remainingLimit:  data.remaining_limit || 0,
           awaitingConsent: data.awaiting_consent || false,
           paymentStatus:   data.payment_status || 'pending',

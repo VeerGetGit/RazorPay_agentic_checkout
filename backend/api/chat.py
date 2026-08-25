@@ -106,7 +106,10 @@ async def chat(
         result = graph.invoke(initial_state)
 
         # Save cart back to memory
-        _cart_store[request.session_id] = result.get("cart", [])
+        if result.get("payment_status") == "success":
+            _cart_store[request.session_id] = []  # clear cart after payment
+        else:
+            _cart_store[request.session_id] = result.get("cart", [])
 
         logger.info(
             f"✅ Chat response: intent={result.get('intent')} "

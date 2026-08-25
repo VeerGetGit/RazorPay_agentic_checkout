@@ -14,8 +14,11 @@ INJECTION_KEYWORDS = [
     "ignore your instructions",
     "ignore all instructions",
     "forget your instructions",
+    "forget all previous",          # ← add
+    "forget previous instructions", # ← add
     "disregard your",
     "you are now",
+    "you are a different",          # ← add
     "pretend you are",
     "act as if",
     "override",
@@ -24,6 +27,9 @@ INJECTION_KEYWORDS = [
     "bypass",
     "do not follow",
     "ignore the rules",
+    "remove all restrictions",      # ← add
+    "set spend limit to",           # ← add
+    "no restrictions",              # ← add
 ]
 
 TOXIC_KEYWORDS = [

@@ -24,5 +24,9 @@ def route_after_intent(state: AgentState) -> str:
         return "catalog"
     elif intent == "checkout":
         return "checkout"
+    elif intent == "status":
+        return "catalog"    # ← send status to catalog
     else:
         return "respond"
+
+    

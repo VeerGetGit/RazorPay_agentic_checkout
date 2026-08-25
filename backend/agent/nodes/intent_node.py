@@ -22,6 +22,8 @@ Rules:
 - Be generous — when in doubt → browse
 - Greetings like "hey", "hi", "hello" → browse
 - "what do you have", "what can I buy" → browse
+- i want to buy 'X' where X is a product → browse
+- buy it' or 'yes' alone → checkout
 - "what is my cart", "show my cart" → status
 - "buy it", "yes confirm", "pay now" → checkout
 - Math homework, coding questions → unknown
@@ -33,6 +35,11 @@ Examples:
 "what's available?"                 → browse
 "add the Pixel 8 to cart"           → browse
 "I need a budget phone"             → browse
+"i want to buy a watch as a gift"   → browse
+"i want to buy something"           → browse
+"i want to shop"                    → browse
+"buy it"                            → checkout
+"yes confirm"                       → checkout
 "buy it"                            → checkout
 "yes confirm"                       → checkout
 "what is my cart?"                  → status
