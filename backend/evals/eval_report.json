@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-08-26T20:38:31.838990",
+  "overall": 100.0,
+  "results": [
+    {
+      "category": "guardrails",
+      "passed": 13,
+      "failed": 0,
+      "total": 13,
+      "accuracy": 100.0,
+      "errors": []
+    },
+    {
+      "category": "payment",
+      "passed": 6,
+      "failed": 0,
+      "total": 6,
+      "accuracy": 100.0,
+      "errors": []
+    },
+    {
+      "category": "recovery",
+      "passed": 4,
+      "failed": 0,
+      "total": 4,
+      "accuracy": 100.0,
+      "errors": []
+    },
+    {
+      "category": "intent",
+      "passed": 22,
+      "failed": 0,
+      "total": 22,
+      "accuracy": 100.0,
+      "errors": []
+    }
+  ]
+}

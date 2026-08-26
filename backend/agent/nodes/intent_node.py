@@ -22,8 +22,8 @@ Rules:
 - Be generous — when in doubt → browse
 - Greetings like "hey", "hi", "hello" → browse
 - "what do you have", "what can I buy" → browse
-- i want to buy 'X' where X is a product → browse
-- buy it' or 'yes' alone → checkout
+- "i want to buy X" where X is a product → browse
+- "buy it" or "yes" alone → checkout
 - "what is my cart", "show my cart" → status
 - "buy it", "yes confirm", "pay now" → checkout
 - Math homework, coding questions → unknown
@@ -40,8 +40,6 @@ Examples:
 "i want to shop"                    → browse
 "buy it"                            → checkout
 "yes confirm"                       → checkout
-"buy it"                            → checkout
-"yes confirm"                       → checkout
 "what is my cart?"                  → status
 "what is my order status"           → status
 "write me an essay"                 → unknown
@@ -51,22 +49,85 @@ Examples:
 def intent_node(state: AgentState) -> AgentState:
     """
     Classifies user intent from latest message.
-    Uses groq/compound for accurate classification.
-
-    Sets state["intent"] to one of:
-    browse / checkout / status / cancel / unknown
-
-    Routes:
-    browse   → catalog_node
-    checkout → checkout_node
-    status   → respond_node (with order status)
-    cancel   → respond_node (with cancel info)
-    unknown  → respond_node (with redirect message)
+    Uses keyword matching first, then LLM as fallback.
     """
 
     user_message = state["messages"][-1].content
-    logger.info(f"🎯 Classifying intent for: '{user_message[:50]}...'")
+    msg          = user_message.lower().strip()
+    logger.info(f"🎯 Classifying intent for: '{user_message[:50]}'")
 
+    def make_audit(intent, method="keyword"):
+        return {
+            "node":      "intent_node",
+            "action":    f"classified as {intent} ({method})",
+            "detail":    f"Message: '{user_message[:100]}'",
+            "status":    "success",
+            "timestamp": _now(),
+        }
+
+    # ── Fast keyword classification ────────────────────────────────────────
+
+    # Checkout
+    checkout_keywords = [
+        "buy it", "yes confirm", "pay now", "confirm payment",
+        "proceed to pay", "place order", "yes please pay",
+        "haan", "confirm", "proceed"
+    ]
+    if any(kw in msg for kw in checkout_keywords):
+        logger.info("✅ Intent: checkout (keyword)")
+        return {
+            **state,
+            "intent":    "checkout",
+            "audit_log": state["audit_log"] + [make_audit("checkout")],
+        }
+
+    # Status
+    status_keywords = [
+        "what is my cart", "show my cart", "my cart",
+        "what is in my cart", "cart total", "order status",
+        "show me my cart", "view cart", "what have i added",
+        "what is my order",
+        "remaining limit",      # ← add
+        "how much have i spent", # ← add
+        "how much left",        # ← add
+        "budget left"
+    ]
+    if any(kw in msg for kw in status_keywords):
+        logger.info("✅ Intent: status (keyword)")
+        return {
+            **state,
+            "intent":    "status",
+            "audit_log": state["audit_log"] + [make_audit("status")],
+        }
+
+    # Browse — greetings and common phrases
+    browse_keywords = [
+        "hello", "hi ", "hey", "what can you do",
+        "help me", "show me", "i want", "i need",
+        "add ", "search", "looking for", "do you have",
+        "do you sell", "what do you", "can you show",
+        "recommend", "suggest", "explore", "browse",
+        "what is trending", "what's good",
+    ]
+    if any(kw in msg for kw in browse_keywords):
+        logger.info("✅ Intent: browse (keyword)")
+        return {
+            **state,
+            "intent":    "browse",
+            "audit_log": state["audit_log"] + [make_audit("browse")],
+        }
+
+    # Cancel
+    cancel_keywords = ["cancel my order", "cancel order", "i want to cancel"]
+    if any(kw in msg for kw in cancel_keywords):
+        logger.info("✅ Intent: cancel (keyword)")
+        return {
+            **state,
+            "intent":    "cancel",
+            "audit_log": state["audit_log"] + [make_audit("cancel")],
+        }
+
+    # ── LLM fallback ───────────────────────────────────────────────────────
     try:
         response = llm.invoke([
             SystemMessage(content=INTENT_SYSTEM_PROMPT),
@@ -75,45 +136,31 @@ def intent_node(state: AgentState) -> AgentState:
 
         intent = response.content.strip().lower()
 
-        # Validate intent is one of allowed values
         allowed_intents = ["browse", "checkout", "status", "cancel", "unknown"]
         if intent not in allowed_intents:
             logger.warning(f"⚠️ Unexpected intent: '{intent}' → defaulting to browse")
             intent = "browse"
 
-        logger.info(f"✅ Intent classified: {intent}")
-
-        # Add to audit log
-        audit_entry = {
-            "node":      "intent_node",
-            "action":    f"classified as {intent}",
-            "detail":    f"Message: '{user_message[:100]}'",
-            "status":    "success",
-            "timestamp": _now(),
-        }
+        logger.info(f"✅ Intent classified: {intent} (LLM)")
 
         return {
             **state,
             "intent":    intent,
-            "audit_log": state["audit_log"] + [audit_entry],
+            "audit_log": state["audit_log"] + [make_audit(intent, "llm")],
         }
 
     except Exception as e:
         logger.error(f"❌ Intent classification error: {e}")
-
-        # Default to browse on error — safest fallback
-        audit_entry = {
-            "node":      "intent_node",
-            "action":    "error — defaulting to browse",
-            "detail":    str(e),
-            "status":    "failed",
-            "timestamp": _now(),
-        }
-
         return {
             **state,
             "intent":    "browse",
-            "audit_log": state["audit_log"] + [audit_entry],
+            "audit_log": state["audit_log"] + [{
+                "node":      "intent_node",
+                "action":    "error — defaulting to browse",
+                "detail":    str(e),
+                "status":    "failed",
+                "timestamp": _now(),
+            }],
         }
 
 
