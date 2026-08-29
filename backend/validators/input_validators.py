@@ -60,17 +60,31 @@ def check_malformed(text: str) -> dict:
         return {"passed": False, "reason": "Message too long"}
     return {"passed": True, "reason": None}
 
+def _normalize_text(message: str) -> str:
+    """Normalize leetspeak and character substitutions."""
+    replacements = {
+        '0': 'o', '1': 'i', '3': 'e', '4': 'a',
+        '5': 's', '6': 'g', '7': 't', '@': 'a',
+        '$': 's', '!': 'i',
+    }
+    normalized = message.lower()
+    for char, replacement in replacements.items():
+        normalized = normalized.replace(char, replacement)
+    return ' '.join(normalized.split())
+
 def validate_input(text: str) -> dict:
     malformed = check_malformed(text)
     if not malformed["passed"]:
         logger.info(f"🚫 Malformed: {malformed['reason']}")
         return malformed
 
-    if _is_toxic(text):
+    normalized = _normalize_text(text)
+
+    if _is_toxic(text) or _is_toxic(normalized):
         logger.warning(f"🚫 Toxic blocked: {text[:50]}")
         return {"passed": False, "reason": "Abusive language detected"}
 
-    if _is_injection(text):
+    if _is_injection(text) or _is_injection(normalized):
         logger.warning(f"🚨 Injection blocked: {text[:50]}")
         return {"passed": False, "reason": "Prompt injection detected"}
 
