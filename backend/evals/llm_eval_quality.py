@@ -52,7 +52,6 @@ def judge(user_msg, agent_response, criteria):
 
         from groq import Groq
         client = Groq(api_key=GROQ_API_KEY)
-        print(f"    API key: {GROQ_API_KEY[:10] if GROQ_API_KEY else 'NONE'}")
 
         completion = client.chat.completions.create(
             model="allam-2-7b",
