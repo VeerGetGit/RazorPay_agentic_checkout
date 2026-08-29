@@ -6,6 +6,7 @@ import OrderReceipt from './OrderReceipt'
 
 const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder }) => {
   const [input, setInput]     = useState('')
+  const [error, setError]     = useState(false)
   const bottomRef             = useRef(null)
   const inputRef              = useRef(null)
   const scrollRef             = useRef(null)
@@ -17,11 +18,28 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
     }
   }, [messages, loading])
 
-  const handleSend = () => {
-    if (!input.trim() || loading) return
-    onSendMessage(input.trim())
-    setInput('')
-    inputRef.current?.focus()
+    // Restore focus after loading completes
+  useEffect(() => {
+    if (!loading) {
+      inputRef.current?.focus()
+    }
+  }, [loading])
+
+  const handleSend = async () => {
+      if (!input.trim() || loading) return
+      setError(false)
+      try {
+          await onSendMessage(input.trim())
+          setInput('')
+          inputRef.current?.focus()
+      } catch (e) {
+          setError(true)
+      }
+  }
+
+  const retry = () => {
+      setError(false)
+      inputRef.current?.focus()
   }
 
   const handleKeyDown = (e) => {
@@ -92,6 +110,21 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
                 <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                 <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="flex justify-center mb-3">
+            <div className="bg-red-900/50 border border-red-700 rounded-xl px-4 py-3 text-red-300 text-sm">
+              ⚠️ Connection issue.
+              <button
+                onClick={retry}
+                className="ml-2 underline hover:text-red-100"
+              >
+                Try again
+              </button>
             </div>
           </div>
         )}
