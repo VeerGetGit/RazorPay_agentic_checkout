@@ -317,7 +317,7 @@ def catalog_node(state: AgentState) -> AgentState:
                 "final_response": response,
             }
 
-                    # ── Budget category query ──────────────────────────────────────────
+        # ── Budget category query ──────────────────────────────────────────
         budget_words = ["decent", "affordable", "cheap", "budget", "inexpensive", "not too expensive"]
         category_map = {
             "watch": "watches", "watches": "watches", "smartwatch": "watches",
@@ -499,6 +499,48 @@ def catalog_node(state: AgentState) -> AgentState:
                 )
                 if not_found:
                     response += f"\n\nCouldn't add: {', '.join(not_found)}"
+
+                # Upsell suggestion
+                upsell_map = {
+                    "phones":  ("⌚ watches", "pair with your phone"),
+                    "watches": ("📱 phones",  "go with your watch"),
+                    "shoes":   ("👜 bags",    "match your shoes"),
+                    "bags":    ("👟 shoes",   "match your bag"),
+                }
+                db_up = SessionLocal()
+                added_product = db_up.query(Product).filter(
+                    Product.name == added[0]
+                ).first()
+                db_up.close()
+
+                if added_product and added_product.category in upsell_map:
+                    suggestion, reason = upsell_map[added_product.category]
+                    upsell_category = list(upsell_map.keys())[
+                        list(upsell_map.values()).index((suggestion, reason))
+                    ]
+                    # Get actual upsell category
+                    cat_map = {
+                        "phones":  "watches",
+                        "watches": "phones",
+                        "shoes":   "bags",
+                        "bags":    "shoes",
+                    }
+                    rec_cat = cat_map.get(added_product.category, "watches")
+
+                    db_rec = SessionLocal()
+                    recommended = db_rec.query(Product).filter(
+                        Product.category == rec_cat,
+                        Product.stock > 0
+                    ).order_by(Product.price.asc()).limit(2).all()
+                    db_rec.close()
+
+                    if recommended:
+                        rec_lines = "\n".join([
+                            f"• {p.name} — ₹{p.price:,.0f}"
+                            for p in recommended
+                        ])
+                        response += f"\n\n💡 **You might also like:**\n{rec_lines}"
+
             else:
                 if not_found:
                     response = "Sorry, couldn't add these items:\n"

@@ -17,6 +17,7 @@ from api.chat import router as chat_router
 from api.audit import router as audit_router
 from api.orders import router as orders_router
 from api.stream import router as stream_router
+from api.catalog import router as catalog_router
 from sqlalchemy.orm import Session
 from db.database import SessionLocal
 import logging
@@ -95,6 +96,7 @@ app.include_router(chat_router,   prefix="/api", tags=["Chat"])
 app.include_router(audit_router,  prefix="/api", tags=["Audit"])
 app.include_router(orders_router, prefix="/api", tags=["Orders"])
 app.include_router(stream_router, prefix="/api", tags=["Stream"])
+app.include_router(catalog_router, tags=["Catalog"]) 
 
 
 # ── Session endpoints ──────────────────────────────────────────────────────
