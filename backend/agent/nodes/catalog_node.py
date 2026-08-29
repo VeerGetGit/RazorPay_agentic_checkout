@@ -58,7 +58,8 @@ def _is_add_to_cart(message: str) -> bool:
 
 
 def _is_remove_from_cart(message: str) -> bool:
-    keywords = ["remove", "delete from cart", "take out", "don't want", "dont want"]
+    keywords = ["remove", "delete from cart", "take out", "don't want", "dont want", "remove the expensive", "remove expensive",  # ← add
+        "remove the cheapest", "remove cheapest","actually no", "no remove", "don't add", "cancel that"]
     return any(kw in message.lower() for kw in keywords)
 
 
@@ -68,7 +69,9 @@ def _is_cart_query(message: str) -> bool:
         "what's in my cart", "what is in my cart",
         "show me my cart", "cart total", "what have i added",
         "what is in my cart now", "what is my cart now",
-        "show me cart",
+        "show me cart","show me cart", "what is my total",    # ← add
+        "what's my total", "my total",          # ← add
+        "cart mein kya", "kitna total", 
     ]
     msg = message.lower()
     if any(add in msg for add in ["add", "buy", "put", "remove"]):
@@ -163,11 +166,40 @@ def _search_products(search_term: str) -> list:
 
         if not products and "-" in search_term:
             clean = search_term.replace("-", " ")
-            brand = search_term.split("-")[0].strip()
+            brand = search_term.split("-")[0].strip().split()[-1] 
             products = db.query(Product).filter(
                 Product.name.ilike(f"%{clean}%") |
                 Product.name.ilike(f"%{brand}%")
             ).limit(5).all()
+
+
+        if not products:
+            brand_map = {
+                "puma": "Puma",
+                "nike": "Nike",
+                "adidas": "Adidas",
+                "apple": "Apple",
+                "samsung": "Samsung",
+                "fastrack": "Fastrack",
+                "titan": "Titan",
+                "noise": "Noise",
+                "redmi": "Redmi",
+                "oneplus": "OnePlus",
+                "pixel": "Pixel",
+                "iphone": "iPhone",
+                "safari": "Safari",
+                "wildcraft": "Wildcraft",
+                "skybags": "Skybags",
+                "lavie": "Lavie",
+                "skechers": "Skechers",
+            }
+            for brand_key, brand_name in brand_map.items():
+                if brand_key in search_term.lower():
+                    products = db.query(Product).filter(
+                        Product.name.ilike(f"%{brand_name}%")
+                    ).limit(5).all()
+                    if products:
+                        break
 
         return products
     finally:
@@ -249,6 +281,15 @@ def catalog_node(state: AgentState) -> AgentState:
             "remaining limit", "how much left", "spend left",
             "budget left", "how much can i spend", "how much do i have",
             "remaining budget", "how much remaining",
+            "how much money",        
+            "money i left",          
+            "money left",            
+            "kitna bacha",           
+            "kitna hai",             
+            "how much i have",       
+            "i have left",           
+            "bacha hai",             
+            "left with",             
         ]
         if any(kw in user_message.lower() for kw in limit_keywords):
             remaining = state["spend_limit"] - state["spent_so_far"]
@@ -276,14 +317,76 @@ def catalog_node(state: AgentState) -> AgentState:
                 "final_response": response,
             }
 
+                    # ── Budget category query ──────────────────────────────────────────
+        budget_words = ["decent", "affordable", "cheap", "budget", "inexpensive", "not too expensive"]
+        category_map = {
+            "watch": "watches", "watches": "watches", "smartwatch": "watches",
+            "phone": "phones", "phones": "phones", "mobile": "phones",
+            "shoe": "shoes", "shoes": "shoes", "sneaker": "shoes",
+            "bag": "bags", "bags": "bags", "backpack": "bags",
+        }
+
+        if any(w in user_message.lower() for w in budget_words):
+            detected_category = None
+            for keyword, category in category_map.items():
+                if keyword in user_message.lower():
+                    detected_category = category
+                    break
+
+            if detected_category:
+                # Set price cap based on category
+                price_cap = {
+                    "watches": 20000,
+                    "phones":  40000,
+                    "shoes":   10000,
+                    "bags":    5000,
+                }.get(detected_category, 20000)
+
+                db = SessionLocal()
+                budget_products = db.query(Product).filter(
+                    Product.category == detected_category,
+                    Product.price <= price_cap,
+                    Product.stock > 0
+                ).order_by(Product.price.asc()).limit(5).all()
+                db.close()
+
+                if budget_products:
+                    lines = []
+                    for p in budget_products:
+                        lines.append(
+                            f"• **{p.name}** — ₹{p.price:,.0f} | In stock ({p.stock})\n"
+                            f"  {p.description}"
+                        )
+                    response = (
+                        f"Here are some affordable {detected_category}:\n\n"
+                        + "\n\n".join(lines)
+                        + "\n\nSay 'I want [product name]' to add to cart."
+                    )
+                    return {
+                        **state,
+                        "messages":       state["messages"] + [AIMessage(content=response)],
+                        "final_response": response,
+                    }
+
+
         # ── Remove from cart ───────────────────────────────────────────────
         if _is_remove_from_cart(user_message):
             clean = (user_message.lower()
                 .replace("remove", "").replace("delete", "")
                 .replace("from cart", "").replace("from my cart", "")
                 .replace("don't want", "").replace("dont want", "")
+                .replace("the ", "")
                 .strip())
             search_term = _extract_product_name(clean) if clean else ""
+            
+             # Handle "expensive" and "cheapest" context
+            if "expensive" in user_message.lower() and cart:
+                most_expensive = max(cart, key=lambda x: x["total"])
+                search_term = most_expensive["name"]
+
+            if "cheapest" in user_message.lower() and cart:
+                cheapest = min(cart, key=lambda x: x["total"])
+                search_term = cheapest["name"]
             new_cart, new_total, removed = _remove_from_cart(cart, search_term)
 
             if removed > 0:
@@ -306,36 +409,62 @@ def catalog_node(state: AgentState) -> AgentState:
             }
 
         # ── Budget query ───────────────────────────────────────────────────
-        budget_match = re.search(r'(\d+)', user_message)
-        if budget_match and any(w in user_message.lower() for w in
-                                ["with", "under", "below", "within", "budget", "worth"]):
-            budget = float(budget_match.group(1))
-            if budget >= 100:
-                db = SessionLocal()
-                budget_products = db.query(Product).filter(
-                    Product.price <= budget,
-                    Product.stock > 0
-                ).order_by(Product.price.desc()).limit(5).all()
-                db.close()
+        # Handle "5k" = 5000
+        k_match = re.search(r'(\d+)\s*k\b', user_message.lower())
+        if k_match:
+            budget = float(k_match.group(1)) * 1000
+            is_budget_query = True
+        else:
+            budget_num = re.search(r'(\d+)', user_message)
+            budget = float(budget_num.group(1)) if budget_num else 0
+            is_budget_query = budget >= 100 and any(
+                w in user_message.lower() for w in
+                ["with", "under", "below", "within", "budget", "worth",
+                 "in ", "something", "show me something", "kuch"]
+            )
 
-                if budget_products:
-                    lines = "\n".join([
-                        f"• {p.name} — ₹{p.price:,.0f}"
-                        for p in budget_products
-                    ])
-                    response = (
-                        f"Here's what you can buy with ₹{budget:,.0f}:\n\n"
-                        f"{lines}\n\n"
-                        f"Say 'I want [product name]' to add to cart."
-                    )
-                else:
-                    response = f"Nothing available under ₹{budget:,.0f} right now."
+        if is_budget_query and budget >= 100:
+            # Check if category mentioned
+            category_filter = None
+            if any(w in user_message.lower() for w in ["watch", "watches", "smartwatch"]):
+                category_filter = "watches"
+            elif any(w in user_message.lower() for w in ["phone", "phones", "mobile"]):
+                category_filter = "phones"
+            elif any(w in user_message.lower() for w in ["shoe", "shoes", "sneaker", "running"]):
+                category_filter = "shoes"
+            elif any(w in user_message.lower() for w in ["bag", "bags", "backpack"]):
+                category_filter = "bags"
 
-                return {
-                    **state,
-                    "messages":       state["messages"] + [AIMessage(content=response)],
-                    "final_response": response,
-                }
+            db = SessionLocal()
+            query = db.query(Product).filter(
+                Product.price <= budget,
+                Product.stock > 0
+            )
+            if category_filter:
+                query = query.filter(Product.category == category_filter)
+            budget_products = query.order_by(Product.price.desc()).limit(5).all()
+            db.close()
+
+            if budget_products:
+                cat_text = f" in {category_filter}" if category_filter else ""
+                lines = "\n".join([
+                    f"• {p.name} — ₹{p.price:,.0f}"
+                    for p in budget_products
+                ])
+                response = (
+                    f"Here's what you can get{cat_text} under ₹{budget:,.0f}:\n\n"
+                    f"{lines}\n\n"
+                    f"Say 'I want [product name]' to add to cart."
+                )
+            else:
+                response = f"Nothing available under ₹{budget:,.0f} right now."
+
+            return {
+                **state,
+                "messages":       state["messages"] + [AIMessage(content=response)],
+                "final_response": response,
+            }
+
 
         # ── Add to cart ────────────────────────────────────────────────────
         if _is_add_to_cart(user_message):
@@ -371,11 +500,34 @@ def catalog_node(state: AgentState) -> AgentState:
                 if not_found:
                     response += f"\n\nCouldn't add: {', '.join(not_found)}"
             else:
-                response = (
-                    "I couldn't find those products.\n\n"
-                    "We have phones, shoes, bags and watches.\n"
-                    "Try being more specific."
-                )
+                if not_found:
+                    response = "Sorry, couldn't add these items:\n"
+                    response += "\n".join([f"• {item}" for item in not_found])
+
+                    # Show alternatives if out of stock
+                    if "out of stock" in " ".join(not_found):
+                        out_of_stock_product = not_found[0].split(" (")[0]
+                        db2 = SessionLocal()
+                        out_p = db2.query(Product).filter(
+                            Product.name.ilike(f"%{out_of_stock_product.split()[0]}%")
+                        ).first()
+                        if out_p:
+                            alts = db2.query(Product).filter(
+                                Product.category == out_p.category,
+                                Product.stock > 0
+                            ).limit(3).all()
+                            if alts:
+                                alt_lines = "\n".join([
+                                    f"• {p.name} — ₹{p.price:,.0f}" for p in alts
+                                ])
+                                response += f"\n\nAvailable alternatives:\n{alt_lines}"
+                        db2.close()
+                else:
+                    response = (
+                        "I couldn't find those products.\n\n"
+                        "We have phones, shoes, bags and watches.\n"
+                        "Try being more specific."
+                    )
 
         # ── Browse / Search ────────────────────────────────────────────────
         else:

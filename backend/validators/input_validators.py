@@ -30,6 +30,14 @@ INJECTION_KEYWORDS = [
     "remove all restrictions",      # ← add
     "set spend limit to",           # ← add
     "no restrictions",              # ← add
+    "set spend limit",
+    "change spend limit",
+    "increase my limit",
+    "change my limit",
+    "give me free",
+    "for free",
+    "free of cost",
+    "without paying"
 ]
 
 TOXIC_KEYWORDS = [

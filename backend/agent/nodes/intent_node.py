@@ -43,6 +43,8 @@ Examples:
 "what is my cart?"                  → status
 "what is my order status"           → status
 "write me an essay"                 → unknown
+"Questions about songs, movies, general knowledge" → unknown
+" 'what is dil dediya', 'who is modi'" → unknown
 """
 
 
@@ -71,7 +73,8 @@ def intent_node(state: AgentState) -> AgentState:
     checkout_keywords = [
         "buy it", "yes confirm", "pay now", "confirm payment",
         "proceed to pay", "place order", "yes please pay",
-        "haan", "confirm", "proceed"
+        "haan", "confirm", "proceed","checkout karna",
+        "khareed","purchase karna"
     ]
     if any(kw in msg for kw in checkout_keywords):
         logger.info("✅ Intent: checkout (keyword)")
@@ -81,17 +84,29 @@ def intent_node(state: AgentState) -> AgentState:
             "audit_log": state["audit_log"] + [make_audit("checkout")],
         }
 
-    # Status
+    #status
     status_keywords = [
         "what is my cart", "show my cart", "my cart",
         "what is in my cart", "cart total", "order status",
         "show me my cart", "view cart", "what have i added",
-        "what is my order",
-        "remaining limit",      # ← add
-        "how much have i spent", # ← add
-        "how much left",        # ← add
-        "budget left"
+        "what is my order", "remaining limit",
+        "how much have i spent", "how much left",
+        "budget left", "how much money",
+        "kitna bacha", "how much do i have",
+        "paisa kitna", "money left",
+        "money do i have", "money i left",
+        "how much i have", "i have left",
+        "bacha hai", "kitna hai",
+        "how much money i",      # ← add
+        "money left with",       # ← add
+        "kitna hai mera",        # ← add
+        "how much remaining",    # ← add
+        "now how much",          # ← add
+        "what is my total",
+        "what's my total",
+        "my total"
     ]
+
     if any(kw in msg for kw in status_keywords):
         logger.info("✅ Intent: status (keyword)")
         return {

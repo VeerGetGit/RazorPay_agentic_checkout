@@ -7,8 +7,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 RESPOND_SYSTEM_PROMPT = """
-You are a friendly shopping assistant.
+You are a friendly shopping assistant for an online store.
+You ONLY help with shopping — browsing products, adding to cart, payments.
+You do NOT answer questions about songs, movies, history, science, or anything unrelated to shopping.
+For off-topic questions say: "I can only help with shopping. Try 'show me phones' or 'show me watches'!"
+
 
 Rules:
 - Be concise and helpful
@@ -36,6 +41,22 @@ def respond_node(state: AgentState) -> AgentState:
     """
 
     logger.info("💬 Respond node generating final response")
+
+    if state.get("input_blocked"):
+        block_reason = state.get("block_reason", "")
+        if "injection" in block_reason.lower():
+            response = "I'm sorry, but I can't help with that."
+        elif "toxic" in block_reason.lower():
+            response = "Please keep it respectful. How can I help you shop?"
+        else:
+            response = "I'm sorry, but I can't process that request."
+        logger.info(f"🚫 Input blocked response: {response}")
+        return {
+            **state,
+            "final_response": response,
+            "messages": state["messages"] + [AIMessage(content=response)],
+        }
+
 
     # ── Use pre-built response if available ───────────────────────────────
     if state.get("final_response"):

@@ -1,4 +1,8 @@
 # backend/main.py
+import os
+os.environ["GUARDRAILS_NO_TELEMETRY"] = "1"
+os.environ["OTEL_SDK_DISABLED"] = "true"
+os.environ["OTEL_TRACES_EXPORTER"] = "none"
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,10 +20,10 @@ from api.stream import router as stream_router
 from sqlalchemy.orm import Session
 from db.database import SessionLocal
 import logging
-import os
 from dotenv import load_dotenv
 
 load_dotenv('.env')
+
 
 logging.basicConfig(
     level  = logging.INFO,

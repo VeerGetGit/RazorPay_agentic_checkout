@@ -8,10 +8,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from dotenv import load_dotenv
 load_dotenv('.env')
 
-from evals.eval_intent     import run_intent_eval
-from evals.eval_guardrails import run_guardrail_eval
-from evals.eval_payment    import run_payment_eval
-from evals.eval_recovery   import run_recovery_eval
+from evals.eval_intent      import run_intent_eval
+from evals.eval_guardrails  import run_guardrail_eval
+from evals.eval_payment     import run_payment_eval
+from evals.eval_recovery    import run_recovery_eval
+from evals.llm_eval_quality import run_llm_quality_eval
 import json
 from datetime import datetime
 
@@ -28,6 +29,7 @@ def run_all_evals():
     results.append(run_payment_eval())
     results.append(run_recovery_eval())
     results.append(run_intent_eval())
+    results.append(run_llm_quality_eval())
 
     # Summary
     print("\n" + "=" * 60)
@@ -39,12 +41,13 @@ def run_all_evals():
 
     for r in results:
         status = "✅" if r["accuracy"] >= 80 else "❌"
-        print(f"{status} {r['category'].upper():15} {r['passed']:3}/{r['total']:3} = {r['accuracy']:6.1f}%")
+        extra = f"avg={r['avg_score']:.1f}/10" if "avg_score" in r else ""
+        print(f"{status} {r['category'].upper():15} {r['passed']:3}/{r['total']:3} = {r['accuracy']:6.1f}% {extra}")
         total_passed += r["passed"]
         total_failed += r["failed"]
 
-    total    = total_passed + total_failed
-    overall  = (total_passed / total * 100) if total > 0 else 0
+    total   = total_passed + total_failed
+    overall = (total_passed / total * 100) if total > 0 else 0
 
     print(f"\n{'OVERALL':15} {total_passed:3}/{total:3} = {overall:.1f}%")
 

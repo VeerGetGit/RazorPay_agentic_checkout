@@ -1,36 +1,45 @@
 {
-  "timestamp": "2026-08-26T20:38:31.838990",
-  "overall": 100.0,
+  "timestamp": "2026-08-26T20:56:28.754239",
+  "overall": 98.61111111111111,
   "results": [
     {
       "category": "guardrails",
-      "passed": 13,
+      "passed": 20,
       "failed": 0,
-      "total": 13,
+      "total": 20,
       "accuracy": 100.0,
       "errors": []
     },
     {
       "category": "payment",
-      "passed": 6,
-      "failed": 0,
-      "total": 6,
-      "accuracy": 100.0,
-      "errors": []
+      "passed": 9,
+      "failed": 1,
+      "total": 10,
+      "accuracy": 90.0,
+      "errors": [
+        {
+          "amount": 1,
+          "limit": 100000,
+          "spent": 99999,
+          "expected": "BLOCK",
+          "got": "PASS",
+          "reason": null
+        }
+      ]
     },
     {
       "category": "recovery",
-      "passed": 4,
+      "passed": 8,
       "failed": 0,
-      "total": 4,
+      "total": 8,
       "accuracy": 100.0,
       "errors": []
     },
     {
       "category": "intent",
-      "passed": 22,
+      "passed": 34,
       "failed": 0,
-      "total": 22,
+      "total": 34,
       "accuracy": 100.0,
       "errors": []
     }

@@ -36,15 +36,17 @@ class PriceHallucinationGuard(Validator):
 
         # Skip checkout summaries and payment confirmations
         skip_phrases = [
-        "Cart total", "Order Summary", "order_",
-        "Payment successful", "🛒", "Total:", "Remaining:",
-        "Here's what you can buy",
-        "products from our catalog",
-        "Added to cart",
-        "Removed from cart",
-        "what you can buy",
-        "you can buy with",
-    ]
+            "Cart total", "Order Summary", "order_",
+            "Payment successful", "🛒", "Total:", "Remaining:",
+            "Here's what you can buy",
+            "Here's what you can get",      # ← add
+            "products from our catalog",
+            "Added to cart", "Removed from cart",
+            "what you can buy", "you can buy with",
+            "spend summary", "Your cart",
+            "you can get",                   # ← add
+            "under ₹",                       # ← add
+        ]
 
         if any(phrase in value for phrase in skip_phrases):
             return PassResult()
