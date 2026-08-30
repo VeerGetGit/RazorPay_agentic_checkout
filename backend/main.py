@@ -18,6 +18,7 @@ from api.audit import router as audit_router
 from api.orders import router as orders_router
 from api.stream import router as stream_router
 from api.catalog import router as catalog_router
+from api.analytics import router as analytics_router
 from sqlalchemy.orm import Session
 from db.database import SessionLocal
 import logging
@@ -100,6 +101,7 @@ app.include_router(audit_router,  prefix="/api", tags=["Audit"])
 app.include_router(orders_router, prefix="/api", tags=["Orders"])
 app.include_router(stream_router, prefix="/api", tags=["Stream"])
 app.include_router(catalog_router, tags=["Catalog"]) 
+app.include_router(analytics_router, tags=["Analytics"])
 
 
 # ── Session endpoints ──────────────────────────────────────────────────────

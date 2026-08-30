@@ -34,6 +34,7 @@ class ChatResponse(BaseModel):
     payment_status:   str
     awaiting_consent: bool
     audit_log:        list
+    order_data:       dict = {}
 
 
 # ── POST /chat ─────────────────────────────────────────────────────────────
@@ -140,6 +141,19 @@ async def chat(
                 audit_db.close()
 
 
+                # Structured order data for AI buyers
+        order_data = {}
+        if result.get("payment_status") == "success":
+            order_data = {
+                "protocol":  "razorpay-agentic-v1",
+                "status":    "success",
+                "order_id":  result.get("razorpay_order_id", ""),
+                "amount":    result.get("payment_amount", 0),
+                "currency":  "INR",
+                "merchant":  "demo-store",
+                "items":     initial_state.get("cart", []),
+            }
+
         return ChatResponse(
             response         = result.get("final_response", ""),
             session_id       = request.session_id,
@@ -152,6 +166,7 @@ async def chat(
             payment_status   = result.get("payment_status", "pending"),
             awaiting_consent = result.get("awaiting_consent", False),
             audit_log        = result.get("audit_log", []),
+            order_data       = order_data,
         )
 
     except Exception as e:

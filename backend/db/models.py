@@ -104,3 +104,18 @@ class AuditLog(Base):
 
     # Relationships
     session = relationship("Session", back_populates="audit_logs")
+
+
+
+class RevenueLog(Base):
+    __tablename__ = "revenue_logs"
+
+    id            = Column(Integer, primary_key=True, autoincrement=True)
+    session_id    = Column(String, nullable=False)
+    merchant_id   = Column(String, default="demo-store")
+    amount        = Column(Float, nullable=False)
+    items         = Column(String, default="[]")
+    had_upsell    = Column(Boolean, default=False)
+    upsell_item   = Column(String, default="")
+    upsell_amount = Column(Float, default=0.0)
+    timestamp     = Column(String, nullable=False)

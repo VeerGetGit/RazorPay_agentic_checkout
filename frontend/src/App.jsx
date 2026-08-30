@@ -8,6 +8,7 @@ import ChatWindow from './components/ChatWindow'
 import AuditTrail from './components/AuditTrail'
 import SpendMeter from './components/SpendMeter'
 import CartSummary from './components/CartSummary'
+import RevenueWidget from './components/RevenueWidget'
 
 const App = () => {
   const [agentState, setAgentState] = useState({
@@ -120,7 +121,7 @@ const App = () => {
         }}
       >
         {/* Left sidebar */}
-        <div style={{display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, overflowY: 'auto'}}>
+        <div style={{display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, overflowY: 'auto', overflowAnchor: 'none'}}>
           <SpendMeter
             spendLimit={spendLimit}
             spentSoFar={agentState.spentSoFar || spentSoFar}
@@ -130,6 +131,7 @@ const App = () => {
             cart={cart}
             cartTotal={cartTotal}
           />
+          <RevenueWidget />
           <div style={{flex: 1, minHeight: '200px'}}>
             <AuditTrail logs={logs} />
           </div>

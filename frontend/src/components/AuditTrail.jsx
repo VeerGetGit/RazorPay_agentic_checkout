@@ -7,8 +7,8 @@ const AuditTrail = ({ logs }) => {
   const bottomRef = useRef(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [logs])
+      // Auto-scroll disabled — user controls audit trail scrolling
+  }, [])
 
   return (
     <div className="bg-slate-800 rounded-xl border border-slate-700 flex flex-col h-64">

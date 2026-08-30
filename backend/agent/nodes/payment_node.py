@@ -49,7 +49,7 @@ def payment_node(state: AgentState) -> AgentState:
                 "audit_log": state["audit_log"] + [audit_entry],
             }
 
-        # ── Success ────────────────────────────────────────────────────────
+       # ── Success ────────────────────────────────────────────────────────
         if result["status"] == "created":
             razorpay_order_id = result["razorpay_order_id"]
             amount            = result["amount"]
@@ -77,6 +77,56 @@ def payment_node(state: AgentState) -> AgentState:
                 "timestamp": _now(),
             }
 
+            # ── Track merchant revenue analytics ───────────────────────
+            try:
+                from api.analytics import track_order
+                # Use initial cart (before clearing)
+                original_cart = state.get("cart", [])
+                had_upsell    = len(original_cart) > 1
+                upsell_item   = original_cart[1]["name"] if had_upsell else None
+                upsell_amount  = original_cart[1]["total"] if had_upsell else 0.0
+                track_order(
+                    session_id  = state["session_id"],
+                    amount      = amount,
+                    items       = original_cart,   # ← use original not cleared
+                    had_upsell  = had_upsell,
+                    upsell_item = upsell_item,
+                    upsell_amount = upsell_amount,
+                )
+            except Exception as e:
+                logger.error(f"❌ Analytics error: {e}")
+
+            # ── Post-payment budget suggestion ─────────────────────────
+            remaining_after   = state["spend_limit"] - new_spent
+            budget_suggestion = ""
+
+            if 500 < remaining_after < state["spend_limit"]:
+                try:
+                    from db.database import SessionLocal as SDB
+                    from db.models import Product as P
+                    sdb       = SDB()
+                    cart_cats = {item.get("category", "") for item in state["cart"]}
+                    suggest   = sdb.query(P).filter(
+                        P.price <= remaining_after,
+                        P.stock > 0,
+                        ~P.category.in_(cart_cats)
+                    ).order_by(P.price.desc()).first()
+                    sdb.close()
+
+                    if suggest:
+                        pct = (suggest.price / amount * 100)
+                        budget_suggestion = (
+                            f"\n\n💡 **Revenue Opportunity**\n"
+                            f"You have ₹{remaining_after:,.0f} remaining.\n"
+                            f"**{suggest.name}** at ₹{suggest.price:,.0f} "
+                            f"complements your purchase.\n"
+                            f"Adding it would increase order value by "
+                            f"+{pct:.1f}%.\n"
+                            f"Would you like to add it?"
+                        )
+                except Exception as e:
+                    logger.error(f"❌ Suggestion error: {e}")
+
             return {
                 **state,
                 "payment_status":    "success",
@@ -85,13 +135,14 @@ def payment_node(state: AgentState) -> AgentState:
                 "payment_failed":    False,
                 "spent_so_far":      new_spent,
                 "remaining_limit":   state["spend_limit"] - new_spent,
-                "cart":              [],      # clear cart after payment
-                "cart_total":        0.0,     # reset cart total
+                "cart":              [],
+                "cart_total":        0.0,
                 "final_response": (
                     f"Payment successful! 🎉\n\n"
                     f"Order ID: {razorpay_order_id}\n"
                     f"Amount:   Rs.{amount:,.0f}\n\n"
                     f"Your order has been placed successfully."
+                    + budget_suggestion
                 ),
                 "audit_log": state["audit_log"] + [audit_entry],
             }
