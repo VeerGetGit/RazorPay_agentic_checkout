@@ -2,7 +2,7 @@
 
 import axios from 'axios'
 
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = 'https://razorpay-agentic-checkout.onrender.com'
 
 // Create axios instance
 const client = axios.create({
