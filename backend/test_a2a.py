@@ -3,7 +3,7 @@
 
 import httpx
 
-BASE = 'http://127.0.0.1:8000'
+BASE = 'https://razorpay-agentic-checkout.onrender.com'
 
 class BuyerAgent:
     def __init__(self, budget: float, category: str = None):
