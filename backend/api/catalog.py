@@ -77,6 +77,12 @@ def agent_discover():
             "merchant_id":  "demo-store",
             "currency":     "INR",
             "spend_limit":  100000,
+            "price_integrity": {
+                                "source":             "database",
+                                "llm_controls_price": False,
+                                "authoritative":      "backend-enforced",
+                                "note":               "All prices enforced server-side from catalog DB. LLM never sets or modifies price.",
+                               },
             "endpoints": {
                 "session":  "POST /api/session/create",
                 "checkout": "POST /api/chat",
