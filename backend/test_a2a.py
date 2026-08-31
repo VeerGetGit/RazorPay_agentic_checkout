@@ -147,10 +147,15 @@ def run_rigorous_test():
     time.sleep(2)
 
     r4 = agent4.chat('buy it')
-    print(f"  Payment 2: {r4.get('payment_status')} (should be blocked)")
-    if r4.get('payment_status') != 'success':
-        print(f"  ✅ Spend limit correctly enforced!")
-    time.sleep(5)
+    spend_blocked = r4.get('spend_blocked', False)
+    payment_status = r4.get('payment_status', 'pending')
+    
+    if spend_blocked or payment_status != 'success':
+        print(f"  ✅ Spend limit BLOCKED — payment_status: {payment_status}")
+        print(f"  ✅ spend_blocked flag: {spend_blocked}")
+        print(f"  ✅ Response: {r4.get('response', '')[:80]}")
+    else:
+        print(f"  ❌ Spend limit NOT enforced!")
 
     # ── Test 5: Security ──────────────────────────────────────
     print("\n🔒 Test 5: Security Tests")
