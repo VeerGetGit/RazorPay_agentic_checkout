@@ -8,7 +8,7 @@ const RevenueWidget = () => {
 
   const fetchMetrics = async () => {
     try {
-      const r = await fetch('http://127.0.0.1:8000/api/analytics/aov')
+      const r = await fetch('https://razorpay-agentic-checkout.onrender.com/api/analytics/aov')
       const d = await r.json()
       setMetrics(d)
     } catch (e) {

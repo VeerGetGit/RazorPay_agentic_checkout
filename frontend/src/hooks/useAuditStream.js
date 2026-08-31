@@ -10,7 +10,7 @@ export const useAuditStream = (sessionId, token) => {
     if (!sessionId || !token) return
 
     // Connect to SSE stream
-    const url = `http://localhost:8000/api/stream/${sessionId}`
+    const url = `https://razorpay-agentic-checkout.onrender.com/api/stream/${sessionId}`
 
     const connect = () => {
       const es = new EventSource(url)
