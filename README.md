@@ -1,36 +1,41 @@
-# Razorpay Agentic Checkout
+# RazorFlow AI
 
-**Track 01 — AI Growth & Agentic Commerce**  
-Razorpay AI Buildathon 2026
+> **When a customer says "buy it", RazorFlow AI makes it happen — for humans and AI buyers alike.**
 
----
-
-## What I Built
-
-A conversational AI agent that lets customers shop using natural language and makes a merchant's store accessible to AI buyers — not just humans.
-
-The agent handles the complete flow: browse → add to cart → spend limit enforcement → payment via Razorpay — all through conversation. No forms. No dropdowns. Just talk.
-
-Beyond human buyers, the store exposes a machine-readable catalog that any AI agent can discover and purchase from autonomously. This is the A2A (agent-to-agent) commerce layer.
+**Track 01 — AI Growth & Agentic Commerce | Razorpay AI Buildathon 2026**
 
 ---
 
-## The Problem
+## Why It Matters
 
-Checkout forms are built for humans. As AI agents start making purchases on behalf of users — and as protocols like NPCI UAP, ACP, and x402 emerge — merchants need to be discoverable and transactable by machines, not just people.
+Checkout forms are built for humans. But AI agents are starting to buy things on behalf of users — and protocols like NPCI UAP, ACP, and x402 are making agent-to-agent commerce the open problem of the year.
 
-NPCI UAP (Unified Agentic Protocol) is India's initiative to make UPI work for AI agents — so any AI can pay on your behalf automatically. Razorpay processes UPI payments. This project demonstrates what that infrastructure looks like in practice.
+Merchants need to be discoverable and transactable by machines, not just people. When an AI agent wants to buy something, it needs:
+- A machine-readable catalog it can parse
+- A natural language interface it can drive
+- A payment system it can trust
+- Proof that every rupee is bounded and auditable
+
+RazorFlow AI provides all four — on top of Razorpay's test-mode APIs.
+
+---
+
+## What Is Built
+
+| Capability | Implementation |
+|-----------|---------------|
+| Conversational checkout | Natural language shopping in English and Hindi/Hinglish — no forms, no dropdowns |
+| Agent-readable catalog | `/api/catalog/agent/discover` with `razorpay-agentic-v1` protocol, `buy_intent` strings, `price_integrity` declaration |
+| Upsell & cross-sell agent | After every add-to-cart, agent recommends complementary products to grow merchant AOV |
+| Spend limit enforcement | Hard cap enforced in code — LLM cannot override, prompt injection cannot bypass |
+| Complete audit trail | Every node decision logged with timestamp — every money action explainable |
+| Merchant revenue dashboard | Real-time AOV, upsell rate, agent-driven revenue % — persisted in SQLite DB |
+| A2A commerce | AI buyer discovers catalog, selects product, pays via Razorpay — zero human involvement |
+| Security guardrails | Injection detection, leetspeak normalization, PII scrubbing, price validation |
+| Evaluation suite | 119 adversarial test cases — 98.3% overall, 100% on guardrails/payment/intent |
 
 ---
 
-## Live Demo
-
-**Backend API:** https://razorpay-agentic-checkout.onrender.com  
-**Agent Catalog:** https://razorpay-agentic-checkout.onrender.com/api/catalog/agent/discover  
-**Health:** https://razorpay-agentic-checkout.onrender.com/health  
-**Merchant Revenue:** https://razorpay-agentic-checkout.onrender.com/api/analytics/revenue  
-
----
 
 ## Architecture
 
@@ -60,16 +65,16 @@ graph TD
 
 | Node | Purpose |
 |------|---------|
-| input_guard | Blocks injections, toxic content, leetspeak |
+| input_guard | Blocks injections, toxic content, leetspeak normalization |
 | intent | Classifies browse / checkout / status / unknown |
 | catalog | Handles browsing, cart, budget queries, upsell |
 | checkout | Builds order summary |
-| spend_guard | Enforces spend cap at code level |
+| spend_guard | Enforces spend cap at code level — not prompt level |
 | action_guard | Confirms payment with user |
 | payment | Calls Razorpay API, creates real order |
 | audit_logger | Logs every decision with timestamp |
-| output_guard | Scrubs PII, validates prices |
-| recovery | Handles failed/cancelled payments |
+| output_guard | Scrubs PII, validates prices against catalog DB |
+| recovery | Handles failed/cancelled payments gracefully |
 
 ---
 
@@ -78,17 +83,17 @@ graph TD
 ### For Human Buyers
 
 ```
-User: "show me phones under 30000"
-Agent: shows Redmi Note 13 Pro at ₹26,999
+User:  "show me phones under 30000"
+Agent: Shows Redmi Note 13 Pro at ₹26,999
 
-User: "add it"
-Agent: added. Cart ₹26,999
+User:  "add it"
+Agent: Added. Cart ₹26,999
        💡 You might also like: Fastrack Reflex Beat
 
-User: "also add fastrack"
-Agent: added. Cart ₹29,994
+User:  "also add fastrack"
+Agent: Added. Cart ₹29,994
 
-User: "buy it"
+User:  "buy it"
 Agent: Payment successful. Order ID: order_xyz
        You have ₹70,006 remaining.
        Samsung Galaxy Watch 6 fits your budget at ₹29,999.
@@ -100,7 +105,6 @@ Every rupee tracked. Every decision in the audit trail.
 ### For AI Buyers (A2A)
 
 Any AI agent can:
-
 1. Read catalog: `GET /api/catalog/agent/discover`
 2. Create session: `POST /api/session/create`
 3. Add to cart: `POST /api/chat` → `"add {product} to cart"`
@@ -111,11 +115,22 @@ No human involved. This is what NPCI UAP enables.
 
 ---
 
+## Safety Model
+
+1. **Prices are always from the catalog database.** The LLM never sets, modifies, or suggests prices. Declared explicitly via `price_integrity` field in the A2A catalog.
+2. **Spend limit is enforced in code.** The LLM cannot override it. Prompt injection cannot bypass it.
+3. **Payment requires explicit user confirmation.** The agent never auto-pays without intent.
+4. **Every money action is logged.** Audit trail is append-only, timestamped, and visible in the UI.
+5. **Input validation runs before any LLM call.** Malicious input never reaches the model.
+6. **Output is validated before delivery.** PII scrubbed. Prices cross-checked against DB.
+
+---
+
 ## What Razorpay Asked For
 
 | Requirement | Status |
 |-------------|--------|
-| Conversational checkout | ✅ Natural language + Hindi/Hinglish |
+| Conversational checkout | ✅ Natural language flow|
 | Agent-readable catalog | ✅ /api/catalog/agent/discover |
 | Upsell & cross-sell | ✅ After every add to cart |
 | Every money action explainable | ✅ Complete audit trail |
@@ -123,44 +138,6 @@ No human involved. This is what NPCI UAP enables.
 | Gated | ✅ Input guard + spend guard + action guard |
 | One failure handled gracefully | ✅ Out of stock, spend exceeded, duplicate order |
 | Razorpay test-mode APIs | ✅ Real order IDs generated |
-
----
-
-## Key Features
-
-### Conversational Commerce
-- Natural language in English and Hindi/Hinglish
-- Budget queries: "watches in 15k", "phones under 30k"
-- Multi-item add: "add iphone, samsung and pixel"
-- Smart cart: "remove the expensive one", "add the cheapest bag"
-- Affordable category: "decent watch", "budget phone"
-
-### Security
-- Prompt injection blocked: "ignore your instructions"
-- Leetspeak normalization: "1gn0re your 1nstruct10ns" → blocked
-- Social engineering: prices always enforced from DB, LLM never sets price
-- Spend limit enforced at code level — not just in the prompt
-- PII scrubbing on all responses
-- SQL injection, XSS handled gracefully
-
-### A2A Commerce
-- `/api/catalog/agent/discover` — machine-readable catalog
-- `price_integrity` field — prices DB-enforced, LLM-independent
-- `buy_intent` strings — no ambiguity for AI buyers
-- `razorpay-agentic-v1` protocol in order confirmations
-- Verified by Claude, ChatGPT, and Gemini independently
-
-### Merchant Revenue Dashboard
-- Real-time AOV tracking
-- Upsell conversion rate
-- Agent-driven revenue percentage
-- Persists in SQLite DB across restarts
-- `/api/analytics/revenue`
-
-### Audit Trail
-- Every node decision logged with timestamp
-- Visible in frontend UI
-- Directly answers "every money action explainable"
 
 ---
 
@@ -176,11 +153,6 @@ LLM_QUALITY   16/18  =  88.9% (independent judge: allam-2-7b)
 OVERALL      117/119 =  98.3%
 ```
 
-```bash
-cd backend
-python evals/eval_report.py
-```
-
 ---
 
 ## A2A Test Results (Live Server)
@@ -193,10 +165,6 @@ Test 4: Spend limit enforcement         → ✅ Second payment correctly blocked
 Test 5: Security (5 attacks)            → ✅ 5/5 blocked including leetspeak
 ```
 
-```bash
-python tests/test_a2a.py
-```
-
 ---
 
 ## Tech Stack
@@ -207,14 +175,12 @@ python tests/test_a2a.py
 | LLM | Groq (groq/compound + openai/gpt-oss-20b) |
 | Payment | Razorpay SDK (test mode) |
 | Frontend | React + Vite + Tailwind CSS |
-| Deployment | Render |
+| Deployment | Render + Vercel |
 | Evals | Custom suite + LLM-as-judge (allam-2-7b) |
 
 ---
 
-## Catalog
-
-20 products across 4 categories:
+## Product Catalog — 20 Products, 4 Categories
 
 | Category | Products |
 |----------|---------|
@@ -243,13 +209,14 @@ npm run dev
 ```
 
 **Environment variables:**
-```
-GROQ_API_KEY=
-RAZORPAY_KEY_ID=
-RAZORPAY_KEY_SECRET=
-SPEND_LIMIT_DEFAULT=100000
-SESSION_EXPIRY_MINUTES=30
-```
+
+| Variable | Purpose |
+|----------|---------|
+| GROQ_API_KEY | Groq LLM API key |
+| RAZORPAY_KEY_ID | Razorpay test mode key ID |
+| RAZORPAY_KEY_SECRET | Razorpay test mode secret |
+| SPEND_LIMIT_DEFAULT | Default spend cap (e.g. 100000) |
+| SESSION_EXPIRY_MINUTES | Session timeout (e.g. 30) |
 
 ---
 
@@ -290,6 +257,20 @@ frontend/
     ├── components/     # UI components
     └── hooks/          # API hooks
 ```
+
+---
+
+## Buildathon Package
+
+| Asset | Location |
+|-------|---------|
+| Architecture diagram | README.md (mermaid) |
+| Failure postmortem | docs/FAILURE_POSTMORTEM.md |
+| Safety invariants | docs/SAFETY_INVARIANTS.md |
+| Video script | docs/VIDEO_SCRIPT.md |
+| Product images | docs/images/|
+| Buildathon criteria review | docs/BUILDATHON_CRITERIA_REVIEW.md |
+| Submission checklist | docs/SUBMISSION_CHECKLIST.md |
 
 ---
 
