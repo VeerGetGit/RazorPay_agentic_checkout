@@ -115,7 +115,7 @@ Five real failures encountered and fixed. Full postmortem in `docs/FAILURE_POSTM
 
 | Requirement | Evidence | Status |
 |-------------|----------|--------|
-| Conversational checkout | Natural language + Hindi/Hinglish | ✅ |
+| Conversational checkout | Natural language flow | ✅ |
 | Razorpay test-mode APIs | Real order IDs in Razorpay dashboard | ✅ |
 | Agent-readable catalog | /api/catalog/agent/discover | ✅ |
 | Upsell & cross-sell | After every add-to-cart | ✅ |
