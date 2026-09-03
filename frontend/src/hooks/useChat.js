@@ -63,6 +63,7 @@ export const useChat = (sessionId, onStateUpdate) => {
           paymentStatus:   data.payment_status || 'pending',
           auditLog:        data.audit_log || [],
           intent:          data.intent,
+          orderData:       data.order_data || null,
         })
       }
 

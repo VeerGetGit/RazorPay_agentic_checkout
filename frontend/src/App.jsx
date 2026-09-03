@@ -41,9 +41,9 @@ const App = () => {
     }
     if (newState.paymentStatus === 'success') {
       setLastOrder({
-        orderId: newState.orderId,
-        amount:  newState.cartTotal,
-        cart:    newState.cart,
+        orderId: newState.orderData?.order_id || '',
+        amount:  newState.orderData?.amount || newState.cartTotal || 0,
+        cart:    newState.orderData?.items || newState.cart || [],
       })
     }
   }, [updateSpend])
