@@ -22,7 +22,7 @@ const FailureAlert = ({ reason, onRetry, onDismiss }) => {
             )}
             <button
               onClick={onDismiss}
-              className="px-3 py-1.5 bg-slate-800 text-slate-400 rounded-lg text-xs hover:bg-slate-700 transition-colors"
+              className="px-3 py-1.5 bg-[#141414] text-slate-400 rounded-lg text-xs hover:bg-[#1E1E1E] transition-colors"
             >
               Dismiss
             </button>

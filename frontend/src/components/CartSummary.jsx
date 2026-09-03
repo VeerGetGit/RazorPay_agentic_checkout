@@ -5,7 +5,7 @@ import { formatRupees } from '../utils/formatters'
 const CartSummary = ({ cart, cartTotal }) => {
   if (!cart || cart.length === 0) {
     return (
-      <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+      <div className="bg-[#141414] rounded-xl p-4 border border-[#2A2A2A]">
         <h3 className="text-slate-400 text-sm font-medium mb-2">🛒 Cart</h3>
         <p className="text-slate-500 text-sm">Your cart is empty</p>
       </div>
@@ -13,7 +13,7 @@ const CartSummary = ({ cart, cartTotal }) => {
   }
 
   return (
-    <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+    <div className="bg-[#141414] rounded-xl p-4 border border-[#2A2A2A]">
       <h3 className="text-slate-400 text-sm font-medium mb-3">
         🛒 Cart ({cart.length} item{cart.length > 1 ? 's' : ''})
       </h3>
@@ -22,7 +22,7 @@ const CartSummary = ({ cart, cartTotal }) => {
         {cart.map((item, index) => (
           <div
             key={index}
-            className="flex justify-between items-center py-2 border-b border-slate-700 last:border-0"
+            className="flex justify-between items-center py-2 border-b border-[#2A2A2A] last:border-0"
           >
             <div className="flex-1">
               <p className="text-slate-200 text-sm font-medium">{item.name}</p>

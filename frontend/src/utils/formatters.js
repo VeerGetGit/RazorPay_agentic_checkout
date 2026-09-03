@@ -25,7 +25,7 @@ export const formatTime = (timestamp) => {
 export const formatStatus = (status) => {
   const map = {
     pending:   { label: 'Pending',   color: 'text-yellow-400' },
-    success:   { label: 'Success',   color: 'text-green-400'  },
+    success:   { label: 'Success',   color: 'text-[#D4A017]'  },
     failed:    { label: 'Failed',    color: 'text-red-400'    },
     cancelled: { label: 'Cancelled', color: 'text-gray-400'   },
   }

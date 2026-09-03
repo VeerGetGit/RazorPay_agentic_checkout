@@ -10,7 +10,7 @@ const MessageBubble = ({ message }) => {
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
       {/* Agent avatar */}
       {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm mr-2 flex-shrink-0 mt-1">
+        <div className="w-8 h-8 rounded-full bg-[#D4A017] flex items-center justify-center text-sm mr-2 flex-shrink-0 mt-1">
           🤖
         </div>
       )}
@@ -19,10 +19,10 @@ const MessageBubble = ({ message }) => {
         <div
           className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
-              ? 'bg-blue-600 text-white rounded-tr-none'
+              ? 'bg-[#D4A017] text-white rounded-tr-none'
               : isError
               ? 'bg-red-900 text-red-200 border border-red-700 rounded-tl-none'
-              : 'bg-slate-700 text-slate-100 rounded-tl-none'
+              : 'bg-[#1E1E1E] text-slate-100 rounded-tl-none'
           }`}
         >
           {message.content}

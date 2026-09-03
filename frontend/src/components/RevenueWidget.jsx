@@ -26,17 +26,17 @@ const RevenueWidget = () => {
   }, [])
 
   if (loading) return (
-    <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+    <div className="bg-[#141414] rounded-xl p-4 border border-[#2A2A2A]">
       <div className="text-slate-500 text-xs">Loading metrics...</div>
     </div>
   )
 
     return (
-    <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+    <div className="bg-[#141414] rounded-xl p-4 border border-[#2A2A2A]">
 
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-green-400 font-bold text-sm flex items-center gap-2">
+        <h3 className="text-[#D4A017] font-bold text-sm flex items-center gap-2">
           📈 Merchant Revenue
         </h3>
         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -45,35 +45,35 @@ const RevenueWidget = () => {
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 gap-2">
 
-        <div className="bg-slate-700 rounded-lg p-2">
+        <div className="bg-[#1E1E1E] rounded-lg p-2">
           <div className="text-slate-400 text-xs mb-1">Total Revenue</div>
           <div className="text-white font-bold text-sm">
             ₹{(metrics?.total_revenue || 0).toLocaleString('en-IN')}
           </div>
         </div>
 
-        <div className="bg-slate-700 rounded-lg p-2">
+        <div className="bg-[#1E1E1E] rounded-lg p-2">
           <div className="text-slate-400 text-xs mb-1">Orders</div>
           <div className="text-white font-bold text-sm">
             {metrics?.total_orders || 0}
           </div>
         </div>
 
-        <div className="bg-slate-700 rounded-lg p-2">
+        <div className="bg-[#1E1E1E] rounded-lg p-2">
           <div className="text-slate-400 text-xs mb-1">Avg Order Value</div>
-          <div className="text-green-400 font-bold text-sm">
+          <div className="text-[#D4A017] font-bold text-sm">
             ₹{Math.round(metrics?.avg_order_value || 0).toLocaleString('en-IN')}
           </div>
         </div>
 
-        <div className="bg-slate-700 rounded-lg p-2">
+        <div className="bg-[#1E1E1E] rounded-lg p-2">
           <div className="text-slate-400 text-xs mb-1">Upsell Rate</div>
           <div className="text-blue-400 font-bold text-sm">
             {metrics?.upsell_rate || '0%'}
           </div>
         </div>
 
-        <div className="bg-slate-700 rounded-lg p-2 col-span-2">
+        <div className="bg-[#1E1E1E] rounded-lg p-2 col-span-2">
           <div className="text-slate-400 text-xs mb-1">Agent Revenue</div>
           <div className="text-purple-400 font-bold text-sm">
             {metrics?.agent_revenue_pct || '0%'} of total revenue
@@ -84,7 +84,7 @@ const RevenueWidget = () => {
 
       {/* Agent Impact */}
       <div className="mt-2 bg-green-900/30 border border-green-700/50 rounded-lg p-2">
-        <div className="text-green-400 text-xs font-medium">
+        <div className="text-[#D4A017] text-xs font-medium">
           🤖 AI Agent Impact
         </div>
         <div className="text-green-300 text-xs mt-1">

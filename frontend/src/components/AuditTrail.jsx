@@ -11,8 +11,8 @@ const AuditTrail = ({ logs }) => {
   }, [])
 
   return (
-    <div className="bg-slate-800 rounded-xl border border-slate-700 flex flex-col h-64">
-      <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+    <div className="bg-[#141414] rounded-xl border border-[#2A2A2A] flex flex-col h-64">
+      <div className="px-4 py-3 border-b border-[#2A2A2A] flex items-center justify-between">
         <h3 className="text-slate-400 text-sm font-medium">📋 Audit Trail</h3>
         <span className="text-slate-500 text-xs">{logs.length} events</span>
       </div>

@@ -15,15 +15,15 @@ const OrderReceipt = ({ orderId, amount, cart, onClose }) => {
 
       <div className="bg-green-900 bg-opacity-50 rounded-lg p-3 space-y-1">
         <div className="flex justify-between text-sm">
-          <span className="text-green-400">Order ID</span>
+          <span className="text-[#D4A017]">Order ID</span>
           <span className="text-green-200 font-mono text-xs">{orderId}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-green-400">Amount</span>
+          <span className="text-[#D4A017]">Amount</span>
           <span className="text-green-200 font-bold">{formatRupees(amount)}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-green-400">Time</span>
+          <span className="text-[#D4A017]">Time</span>
           <span className="text-green-200">{formatTime(new Date().toISOString())}</span>
         </div>
       </div>

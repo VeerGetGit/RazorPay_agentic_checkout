@@ -57,18 +57,18 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
   ]
 
   return (
-    <div className="flex flex-col bg-slate-900 rounded-xl border border-slate-700 overflow-hidden" style={{height: '100%'}}>
+    <div className="flex flex-col bg-[#0A0A0A] rounded-xl border border-[#2A2A2A] overflow-hidden" style={{height: '100%'}}>
 
       {/* Header */}
-      <div className="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center gap-3 flex-shrink-0">
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+      <div className="px-4 py-3 bg-[#141414] border-b border-[#2A2A2A] flex items-center gap-3 flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[#D4A017] flex items-center justify-center">
           🤖
         </div>
         <div>
           <h2 className="text-white font-bold text-sm">RazorFlow Agent</h2>
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-green-400 text-xs">Online</span>
+            <span className="text-[#D4A017] text-xs">Online</span>
           </div>
         </div>
       </div>
@@ -101,10 +101,10 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
         {/* Loading indicator */}
         {loading && (
           <div className="flex justify-start mb-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm mr-2">
+            <div className="w-8 h-8 rounded-full bg-[#D4A017] flex items-center justify-center text-sm mr-2">
               🤖
             </div>
-            <div className="bg-slate-700 rounded-2xl rounded-tl-none px-4 py-3">
+            <div className="bg-[#1E1E1E] rounded-2xl rounded-tl-none px-4 py-3">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                 <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -139,7 +139,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
             key={reply}
             onClick={() => onSendMessage(reply)}
             disabled={loading}
-            className="flex-shrink-0 px-3 py-1.5 bg-slate-700 text-slate-300 rounded-full text-xs hover:bg-slate-600 transition-colors disabled:opacity-50"
+            className="flex-shrink-0 px-3 py-1.5 bg-[#1E1E1E] text-slate-300 rounded-full text-xs hover:bg-slate-600 transition-colors disabled:opacity-50"
           >
             {reply}
           </button>
@@ -147,7 +147,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 bg-slate-800 border-t border-slate-700 flex gap-2 flex-shrink-0">
+      <div className="px-4 py-3 bg-[#141414] border-t border-[#2A2A2A] flex gap-2 flex-shrink-0">
         <input
           ref={inputRef}
           type="text"
@@ -157,12 +157,12 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
           placeholder="Type a message... (e.g. show me phones)"
           disabled={loading}
           maxLength={500}
-          className="flex-1 bg-slate-700 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 bg-[#1E1E1E] text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
         <button
           onClick={handleSend}
           disabled={loading || !input.trim()}
-          className="px-4 py-2.5 bg-blue-600 text-white rounded-xl font-medium text-sm hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2.5 bg-[#D4A017] text-white rounded-xl font-medium text-sm hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? '...' : 'Send'}
         </button>

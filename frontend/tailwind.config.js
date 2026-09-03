@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
@@ -7,21 +6,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50:  '#e8f4ff',
-          100: '#d1e9ff',
-          500: '#2D5BE3',
-          600: '#1E47D4',
-          700: '#1535A8',
-          900: '#0A1628',
-        },
-        accent: {
-          400: '#00D09C',
-          500: '#00B589',
+        gold: {
+          400: '#F0C040',
+          500: '#D4A017',
+          600: '#B8860B',
         },
         surface: {
-          800: '#0F1729',
-          900: '#080E1A',
+          900: '#0A0A0A',
+          800: '#141414',
+          700: '#1E1E1E',
+          600: '#2A2A2A',
         }
       }
     },

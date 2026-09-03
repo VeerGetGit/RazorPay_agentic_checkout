@@ -14,7 +14,7 @@ const SpendMeter = ({ spendLimit, spentSoFar, remainingLimit }) => {
   }
 
   return (
-    <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+    <div className="bg-[#141414] rounded-xl p-4 border border-[#2A2A2A]">
       <div className="flex justify-between items-center mb-2">
         <span className="text-slate-400 text-sm font-medium">💰 Spend Limit</span>
         <span className="text-slate-300 text-sm">
@@ -23,7 +23,7 @@ const SpendMeter = ({ spendLimit, spentSoFar, remainingLimit }) => {
       </div>
 
       {/* Progress bar */}
-      <div className="w-full bg-slate-700 rounded-full h-3 mb-2">
+      <div className="w-full bg-[#1E1E1E] rounded-full h-3 mb-2">
         <div
           className={`h-3 rounded-full transition-all duration-500 ${getColor()}`}
           style={{ width: `${percentage}%` }}
@@ -34,7 +34,7 @@ const SpendMeter = ({ spendLimit, spentSoFar, remainingLimit }) => {
         <span className="text-slate-500">Used: {formatRupees(spentSoFar)}</span>
         <span className={`font-medium ${
           percentage >= 90 ? 'text-red-400' :
-          percentage >= 70 ? 'text-yellow-400' : 'text-green-400'
+          percentage >= 70 ? 'text-yellow-400' : 'text-[#D4A017]'
         }`}>
           {formatRupees(remainingLimit || spendLimit - spentSoFar)} remaining
         </span>
