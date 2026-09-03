@@ -264,15 +264,13 @@ frontend/
 
 | Asset | Location |
 |-------|---------|
-| Architecture diagram | README.md (mermaid) |
-| Failure postmortem | docs/FAILURE_POSTMORTEM.md |
-| Safety invariants | docs/SAFETY_INVARIANTS.md |
-| Video script | docs/VIDEO_SCRIPT.md |
-| Product images | docs/images/|
-| Buildathon criteria review | docs/BUILDATHON_CRITERIA_REVIEW.md |
-| Submission checklist | docs/SUBMISSION_CHECKLIST.md |
-
----
+| Architecture diagram | [README.md](README.md) (mermaid) |
+| Failure postmortem | [docs/FAILURE_POSTMORTEM.md](docs/FAILURE_POSTMORTEM.md) |
+| Safety invariants | [docs/SAFETY_INVARIANTS.md](docs/SAFETY_INVARIANTS.md) |
+| Video script | [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) |
+| Product images | [docs/images/](docs/images/) |
+| Buildathon criteria review | [docs/BUILDATHON_CRITERIA_REVIEW.md](docs/BUILDATHON_CRITERIA_REVIEW.md) |
+| Submission checklist | [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) |
 
 ## Future Work
 
