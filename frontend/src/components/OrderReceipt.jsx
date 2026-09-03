@@ -2,7 +2,7 @@
 
 import { formatRupees, formatTime } from '../utils/formatters'
 
-const OrderReceipt = ({ orderId, amount, cart, onClose }) => {
+const OrderReceipt = ({ orderId, amount, cart, onClose, time }) => {
   return (
     <div className="bg-[#141414] border border-[#D4A017] rounded-xl p-4 mx-0 mb-3">
       <div className="flex items-center gap-2 mb-3">
@@ -24,7 +24,7 @@ const OrderReceipt = ({ orderId, amount, cart, onClose }) => {
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-400">Time</span>
-          <span className="text-white">{formatTime(time)}</span>
+          <span className="text-white">{formatTime(time || new Date().toISOString())}</span>
         </div>
       </div>
 
