@@ -44,6 +44,7 @@ const App = () => {
         orderId: newState.orderData?.order_id || '',
         amount:  newState.orderData?.amount || newState.cartTotal || 0,
         cart:    newState.orderData?.items || newState.cart || [],
+        time:    new Date().toISOString(), 
       })
     }
   }, [updateSpend])
@@ -61,7 +62,7 @@ const App = () => {
     return (
       <div className="h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-[#D4A017] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-400">Initializing session...</p>
         </div>
       </div>
@@ -85,7 +86,7 @@ const App = () => {
   }
 
   return (
-    <div style={{height: '100vh', background: '#0f172a', padding: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column'}}>
+    <div style={{height: '100vh', background: '#0A0A0A', padding: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column'}}>
 
       {/* Header */}
       <div style={{marginBottom: '16px', flexShrink: 0}}>

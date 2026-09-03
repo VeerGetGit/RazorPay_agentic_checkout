@@ -24,7 +24,7 @@ const OrderReceipt = ({ orderId, amount, cart, onClose }) => {
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-400">Time</span>
-          <span className="text-white">{formatTime(new Date().toISOString())}</span>
+          <span className="text-white">{formatTime(time)}</span>
         </div>
       </div>
 

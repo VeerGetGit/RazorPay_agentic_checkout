@@ -94,6 +94,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
             orderId={lastOrder.orderId}
             amount={lastOrder.amount}
             cart={lastOrder.cart}
+            time={lastOrder.time}
             onClose={() => {}}
           />
         )}
