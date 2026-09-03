@@ -278,7 +278,6 @@ frontend/
 - Webhook support for async order updates
 - Agent identity framework (DID) for verified AI buyers
 - Full NPCI UAP protocol compliance
-- Multi-merchant support with isolated dashboards
 
 ---
 
