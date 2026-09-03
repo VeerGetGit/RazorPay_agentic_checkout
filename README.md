@@ -1,6 +1,6 @@
 # RazorFlow AI
 
-> **When a customer says "buy it", RazorFlow AI makes it happen — for humans and AI buyers alike.**
+> **When a customer says "buy it", RazorFlow AI makes it happen for humans and AI buyers alike.**
 
 **Track 01 — AI Growth & Agentic Commerce | Razorpay AI Buildathon 2026**
 
@@ -8,7 +8,7 @@
 
 ## Why It Matters
 
-Checkout forms are built for humans. But AI agents are starting to buy things on behalf of users — and protocols like NPCI UAP, ACP, and x402 are making agent-to-agent commerce the open problem of the year.
+Checkout forms are built for humans. But AI agents are starting to buy things on behalf of users and protocols like NPCI UAP, ACP, and x402 are making agent-to-agent commerce the open problem of the year.
 
 Merchants need to be discoverable and transactable by machines, not just people. When an AI agent wants to buy something, it needs:
 - A machine-readable catalog it can parse
@@ -16,7 +16,7 @@ Merchants need to be discoverable and transactable by machines, not just people.
 - A payment system it can trust
 - Proof that every rupee is bounded and auditable
 
-RazorFlow AI provides all four — on top of Razorpay's test-mode APIs.
+RazorFlow AI provides all four on top of Razorpay's test-mode APIs.
 
 ---
 
@@ -24,7 +24,7 @@ RazorFlow AI provides all four — on top of Razorpay's test-mode APIs.
 
 | Capability | Implementation |
 |-----------|---------------|
-| Conversational checkout | Natural language shopping in English and Hindi/Hinglish — no forms, no dropdowns |
+| Conversational checkout | Natural language shopping — no forms, no dropdowns |
 | Agent-readable catalog | `/api/catalog/agent/discover` with `razorpay-agentic-v1` protocol, `buy_intent` strings, `price_integrity` declaration |
 | Upsell & cross-sell agent | After every add-to-cart, agent recommends complementary products to grow merchant AOV |
 | Spend limit enforcement | Hard cap enforced in code — LLM cannot override, prompt injection cannot bypass |
