@@ -65,7 +65,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
           🤖
         </div>
         <div>
-          <h2 className="text-white font-bold text-sm">Razorpay Shopping Agent</h2>
+          <h2 className="text-white font-bold text-sm">RazorFlow Agent</h2>
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             <span className="text-green-400 text-xs">Online</span>

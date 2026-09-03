@@ -96,10 +96,10 @@ const App = () => {
             </div>
             <div>
               <h1 className="text-white font-bold text-lg">
-                Razorpay Agentic Checkout
+                RazorFlow AI
               </h1>
               <p className="text-slate-400 text-xs">
-                AI-powered conversational shopping
+                Agentic Commerce Platform
               </p>
             </div>
           </div>
