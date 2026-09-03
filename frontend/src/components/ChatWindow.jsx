@@ -140,8 +140,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
             key={reply}
             onClick={() => onSendMessage(reply)}
             disabled={loading}
-            className="flex-shrink-0 px-3 py-1.5 bg-[#1E1E1E] text-slate-300 rounded-full text-xs hover:bg-slate-600 transition-colors disabled:opacity-50"
-          >
+            className="flex-shrink-0 px-3 py-1.5 bg-[#1E1E1E] text-slate-300 rounded-full text-xs hover:bg-[#2A2A2A] transition-colors disabled:opacity-50"          >
             {reply}
           </button>
         ))}
@@ -163,7 +162,7 @@ const ChatWindow = ({ messages, loading, onSendMessage, paymentStatus, lastOrder
         <button
           onClick={handleSend}
           disabled={loading || !input.trim()}
-          className="px-4 py-2.5 bg-[#D4A017] text-white rounded-xl font-medium text-sm hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2.5 bg-[#D4A017] text-black rounded-xl font-medium text-sm hover:bg-[#F0C040] transition-colors"
         >
           {loading ? '...' : 'Send'}
         </button>
